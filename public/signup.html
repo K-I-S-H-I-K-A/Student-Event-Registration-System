@@ -11,10 +11,10 @@
 
 <body>
 
-    <div class="login-container">
+    <div class="register-container">
 
         <!-- LEFT SIDE -->
-        <div class="login-left">
+        <div class="register-left">
             <div class="logo-box">LOGO</div>
 
             <h2>
@@ -25,17 +25,23 @@
         </div>
 
         <!-- RIGHT SIDE -->
-        <div class="login-right">
-            <div class="login-box">
-                <h2>Welcome Back</h2>
+        <div class="register-right">
+            <div class="register-box">
+                <h2>Create a New Account</h2>
 
                 <input type="email" placeholder="Email">
+                <input type="text" placeholder="Full Name">
+                <input type="text" placeholder="Phone Number">
                 <input type="password" placeholder="Password">
+                <select name="role" id="role">
+                    <option value="List properties">User</option>
+                    <option value="Book properties">Admin</option>
+                </select>
 
-                <button>LOGIN</button>
+                <button>CREATE ACCOUNT</button>
 
-                <p class="register-link">
-                    New Here? <a href="#">Register</a>
+                <p class="login-link">
+                    Already have an account? <a href="#">Login</a>
                 </p>
             </div>
         </div>

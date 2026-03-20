@@ -123,14 +123,15 @@ footer {
 
 .logo-box {
     background: #e5e7ea;
-    padding: 15px 30px;
+    padding: 70px 100px;
+    font-size: 60px;
     font-weight: bold;
 }
 
 .login-left h2 {
-    max-width: 250px;
-    font-size: 22px;
-    line-height: 1.4;
+    max-width: 550px;
+    font-size: 52px;
+    line-height: 1.1;
 }
 
 /* RIGHT PANEL */
@@ -185,13 +186,92 @@ footer {
 
 .register-link a {
     text-decoration: none;
-    color: black;
+    color: blue;
     font-weight: 500;
 }
 
 .register-link a:hover {
-    color: blue;
     text-decoration: underline;
+}
+
+/* FULL PAGE */
+.register-container {
+    display: flex;
+    height: 92vh;
+}
+
+/* LEFT PANEL */
+.register-left {
+    flex: 1;
+    background-color: #aeb6bf;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    text-align: center;
+}
+
+.register-left h2 {
+    max-width: 550px;
+    font-size: 52px;
+    line-height: 1.1;
+}
+
+/* RIGHT PANEL */
+.register-right {
+    flex: 1;
+    background-color: #aeb6bf;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* REGISTER CARD */
+.register-box {
+    width: 420px;  
+    padding: 40px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* TITLE */
+.register-box h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* INPUTS */
+.register-box input {
+    padding: 12px;
+    border: 1px solid #bbb;
+    background: #f0f0f0;
+    font-size: 14px;
+}
+
+/* BUTTON */
+.register-box button {
+    padding: 12px;
+    background-color: #b8c0c8;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-box select {
+    padding: 12px;
+    border: 1px solid #bbb;
+    background: #f0f0f0;
+    font-size: 14px;
+}
+
+.login-link {
+    text-align: center;
+    font-size: 13px;
 }
 
 
