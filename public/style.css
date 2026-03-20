@@ -112,7 +112,7 @@ footer {
 /* LEFT PANEL */
 .login-left {
     flex: 1;
-    background-color: #aeb6bf; /* darker gray like image */
+    background-color: #aeb6bf;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -144,7 +144,7 @@ footer {
 
 /* LOGIN CARD */
 .login-box {
-    width: 420px;              /* bigger like image */
+    width: 420px;  
     padding: 40px;
     background: #f7f7f7;
     border-radius: 10px;
