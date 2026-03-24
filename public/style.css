@@ -1,4 +1,8 @@
 /* GENERAL */
+* {
+    transition: 0.2s ease;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -14,18 +18,25 @@ header {
     background-color: #e9ecef;
 }
 
+nav {
+    display: flex;
+    align-items: center;
+}
+
 nav a {
-    margin: 0 15px;
+    margin-left: 20px;
     text-decoration: none;
     color: #333;
     font-weight: 500;
 }
 
-nav button {
-    padding: 6px 12px;
-    border: none;
-    background-color: #cfd4da;
-    cursor: pointer;
+nav a:hover {
+    text-decoration: underline;
+}
+
+nav a.active {
+    font-weight: bold;
+    border-bottom: 2px solid #333;
 }
 
 /* HERO SECTION */
@@ -75,6 +86,11 @@ nav button {
     border-radius: 6px;
 }
 
+.card:hover {
+    transform: translateY(-3px);
+    cursor: pointer;
+}
+
 .image-placeholder {
     width: 100%;
     height: 100px;
@@ -92,6 +108,11 @@ nav button {
     background: #cfd4da;
     border: none;
     cursor: pointer;
+    border-radius: 4px;
+}
+
+.card button:hover {
+    background-color: #9ea7af;
 }
 
 /* FOOTER */
@@ -103,14 +124,14 @@ footer {
     font-size: 12px;
 }
 
-/* FULL PAGE */
-.login-container {
+/* ================= AUTH PAGES (LOGIN + REGISTER) ================= */
+
+.auth-container {
     display: flex;
     height: 92vh;
 }
 
-/* LEFT PANEL */
-.login-left {
+.auth-left {
     flex: 1;
     background-color: #aeb6bf;
     display: flex;
@@ -128,14 +149,13 @@ footer {
     font-weight: bold;
 }
 
-.login-left h2 {
+.auth-left h2 {
     max-width: 550px;
     font-size: 52px;
     line-height: 1.1;
 }
 
-/* RIGHT PANEL */
-.login-right {
+.auth-right {
     flex: 1;
     background-color: #e9eaec;
     display: flex;
@@ -143,9 +163,8 @@ footer {
     align-items: center;
 }
 
-/* LOGIN CARD */
-.login-box {
-    width: 420px;  
+.auth-box {
+    width: 420px;
     padding: 40px;
     background: #f7f7f7;
     border-radius: 10px;
@@ -155,123 +174,220 @@ footer {
     gap: 20px;
 }
 
-/* TITLE */
-.login-box h2 {
+.auth-box h2 {
     text-align: center;
-    margin-bottom: 10px;
 }
 
-/* INPUTS */
-.login-box input {
+.auth-box input,
+.auth-box select {
     padding: 12px;
     border: 1px solid #bbb;
     background: #f0f0f0;
     font-size: 14px;
 }
 
-/* BUTTON */
-.login-box button {
+.auth-box button {
     padding: 12px;
     background-color: #b8c0c8;
     border: none;
     font-weight: bold;
     cursor: pointer;
+    border-radius: 4px;
 }
 
-/* REGISTER TEXT */
-.register-link {
-    text-align: center;
-    font-size: 13px;
+.auth-box button:hover {
+    background-color: #9ea7af;
 }
 
-.register-link a {
-    text-decoration: none;
-    color: blue;
-    font-weight: 500;
-}
-
-.register-link a:hover {
-    text-decoration: underline;
-}
-
-/* FULL PAGE */
-.register-container {
-    display: flex;
-    height: 92vh;
-}
-
-/* LEFT PANEL */
-.register-left {
-    flex: 1;
-    background-color: #aeb6bf;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    text-align: center;
-}
-
-.register-left h2 {
-    max-width: 550px;
-    font-size: 52px;
-    line-height: 1.1;
-}
-
-/* RIGHT PANEL */
-.register-right {
-    flex: 1;
-    background-color: #aeb6bf;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* REGISTER CARD */
-.register-box {
-    width: 420px;  
-    padding: 40px;
-    background: #f7f7f7;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* TITLE */
-.register-box h2 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-/* INPUTS */
-.register-box input {
-    padding: 12px;
-    border: 1px solid #bbb;
-    background: #f0f0f0;
-    font-size: 14px;
-}
-
-/* BUTTON */
-.register-box button {
-    padding: 12px;
-    background-color: #b8c0c8;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.register-box select {
-    padding: 12px;
-    border: 1px solid #bbb;
-    background: #f0f0f0;
-    font-size: 14px;
-}
-
+.register-link,
 .login-link {
     text-align: center;
     font-size: 13px;
 }
 
+.register-link a,
+.login-link a {
+    text-decoration: none;
+    color: blue;
+    font-weight: 500;
+}
 
+.register-link a:hover,
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* ================= DETAILS PAGE ================= */
+
+.details-container {
+    display: flex;
+    padding: 20px 40px;
+    gap: 30px;
+}
+
+.details-left {
+    flex: 2;
+}
+
+.details-right {
+    flex: 1;
+    margin-top: 20px;
+}
+
+/* BACK LINK */
+.back-link a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
+}
+
+/* IMAGE */
+.main-image {
+    width: 100%;
+    height: 250px;
+    background: #ddd;
+    margin: 15px 0;
+}
+
+/* THUMBNAILS */
+.thumbnail-row {
+    display: flex;
+    gap: 10px;
+}
+
+.thumb {
+    width: 80px;
+    height: 60px;
+    background: #ccc;
+}
+
+.arrow {
+    padding: 15px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+/* AMENITIES */
+.amenities {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.amenities span {
+    display: inline-block;
+}
+
+/* OWNER */
+.owner-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 15px 0;
+    cursor: pointer;
+    background: #f8f8f8;
+}
+
+.owner-box:hover {
+    background: #f0f0f0;
+}
+
+/* REVIEWS */
+.review-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* BOOKING BOX */
+.booking-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* DATE INPUT */
+.booking-box input {
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+/* TIME DROPDOWNS */
+.time-row {
+    display: flex;
+    gap: 10px;
+}
+
+.time-row select {
+    padding: 6px;
+}
+
+/* PRICE SECTION */
+.price-box {
+    font-size: 14px;
+}
+
+.price-box p {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.price-box hr {
+    margin: 10px 0;
+}
+
+/* BOOK BUTTON */
+.book-btn {
+    width: 100%;
+    padding: 12px;
+    background: #9e9e9e;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.book-btn:hover {
+    background: #7f7f7f;
+}
+
+/* NOTE TEXT */
+.note {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+/* CALENDAR */
+.calendar-box {
+    border: 1px solid #ccc;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.calendar-grid span {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+.calendar-grid span:hover {
+    background: #ddd;
+    cursor: pointer;
+}

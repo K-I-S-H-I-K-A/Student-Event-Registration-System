@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,49 +10,49 @@
 
 <body>
 
-    <div class="register-container">
+<div class="auth-container">
 
-        <!-- LEFT SIDE -->
-        <div class="register-left">
-            <div class="logo-box">LOGO</div>
+    <!-- LEFT -->
+    <div class="auth-left">
+        <div class="logo-box">LOGO</div>
 
-            <h2>
-                Find Your <br>
-                Perfect Workspace <br>
-                Anytime, Anywhere
-            </h2>
-        </div>
-
-        <!-- RIGHT SIDE -->
-        <div class="register-right">
-            <div class="register-box">
-                <h2>Create a New Account</h2>
-
-                <input type="email" placeholder="Email">
-                <input type="text" placeholder="Full Name">
-                <input type="text" placeholder="Phone Number">
-                <input type="password" placeholder="Password">
-                <select name="role" id="role">
-                    <option value="List properties">User</option>
-                    <option value="Book properties">Admin</option>
-                </select>
-
-                <button>CREATE ACCOUNT</button>
-
-                <p class="login-link">
-                    Already have an account? <a href="#">Login</a>
-                </p>
-            </div>
-        </div>
-
+        <h2>
+            Find Your <br>
+            Perfect Workspace <br>
+            Anytime, Anywhere
+        </h2>
     </div>
 
-    <footer>
-        Contact | Terms | Privacy | 2026 Workspace App
-    </footer>
+    <!-- RIGHT -->
+    <div class="auth-right">
+        <div class="auth-box">
+            <h2>Create a New Account</h2>
 
-    <script src="app.js"></script>
+            <input type="email" id="email" placeholder="Email">
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="text" id="phone" placeholder="Phone Number">
+            <input type="password" id="password" placeholder="Password">
+
+            <select id="role">
+                <option value="user">User</option>
+                <option value="owner">Owner</option>
+            </select>
+
+            <button type="button" onclick="registerUser()">CREATE ACCOUNT</button>
+
+            <p class="login-link">
+                Already have an account? <a href="login.html">Login</a>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    Contact | Terms | Privacy | 2026 Workspace App
+</footer>
+
+<script src="app.js"></script>
 
 </body>
-
 </html>
