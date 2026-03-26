@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace Details</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- HEADER -->
 <header>
     <h2>LOGO</h2>
-
     <div>
         <a href="index.html">Browse Spaces</a>
         <a href="#">My Bookings</a>
@@ -21,10 +18,8 @@
     </div>
 </header>
 
-<!-- MAIN -->
 <div class="details-container">
 
-    <!-- LEFT -->
     <div class="details-left">
 
         <p class="back-link">
@@ -32,12 +27,10 @@
         </p>
 
         <h2>Company Name</h2>
-        <p class="location">📍 123 Place Street, Cityname</p>
+        <p class="location"> 123 Place Street, Cityname</p>
 
-        <!-- IMAGE -->
         <div class="main-image"></div>
 
-        <!-- THUMBNAILS -->
         <div class="thumbnail-row">
             <div class="thumb"></div>
             <div class="thumb"></div>
@@ -46,40 +39,35 @@
             <div class="arrow">››</div>
         </div>
 
-        <!-- AMENITIES -->
         <h3>Amenities</h3>
         <div class="amenities">
-            <span>📶 Wifi</span>
-            <span>🖨 Printer</span>
-            <span>🚗 Parking</span>
-            <span>🏢 Meeting Rooms</span>
-            <span>🍴 Kitchen</span>
+            <div class="amenity"><span></span><p>High Speed Wifi</p></div>
+            <div class="amenity"><span></span><p>Printer & Copier</p></div>
+            <div class="amenity"><span></span><p>Parking</p></div>
+            <div class="amenity"><span></span><p>Meeting Rooms</p></div>
+            <div class="amenity"><span></span><p>Kitchen</p></div>
         </div>
 
-        <!-- DESCRIPTION -->
         <p class="description">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>
 
-        <!-- OWNER -->
-        <div class="owner-box" onclick="goToOwner()">
-            <span class="avatar">👤</span>
+        <div class="owner-box">
+            <span class="avatar"></span>
             <div>
                 <strong>Owner Name</strong>
                 <p>Host</p>
             </div>
         </div>
 
-        <!-- REVIEWS -->
         <h3>Reviews</h3>
         <div class="review-box">
-            <strong>Reviewer ⭐⭐⭐⭐⭐</strong>
+            <strong>Reviewer</strong>
             <p>Great workspace!</p>
         </div>
 
     </div>
 
-    <!-- RIGHT -->
     <div class="details-right">
 
         <div class="booking-box">
@@ -89,13 +77,8 @@
             <input type="date">
 
             <div class="time-row">
-                <select>
-                    <option>Start Time</option>
-                </select>
-
-                <select>
-                    <option>Hours</option>
-                </select>
+                <select><option>Start Time</option></select>
+                <select><option>Hours</option></select>
             </div>
 
             <div class="price-box">
@@ -105,18 +88,13 @@
                 <p><strong>Total</strong> <strong>$158</strong></p>
             </div>
 
-            <button class="book-btn" onclick="bookWorkspace()">Book Now</button>
+            <button class="book-btn">Book Now</button>
             <p class="note">No Payment required yet</p>
 
         </div>
 
-        <!-- CALENDAR -->
         <div class="calendar-box">
-            <h4>
-                <span onclick="prevMonth()">‹</span>
-                March 2026
-                <span onclick="nextMonth()">›</span>
-            </h4>
+            <h4>March 2026</h4>
 
             <div class="calendar-grid">
                 <span>1</span><span>2</span><span>3</span><span>4</span>
@@ -130,12 +108,9 @@
 
 </div>
 
-<!-- FOOTER -->
 <footer>
     Contact | Terms | Privacy | Workspace 2026
 </footer>
-
-<script src="app.js"></script>
 
 </body>
 </html>

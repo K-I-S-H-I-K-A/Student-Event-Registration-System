@@ -18,6 +18,14 @@ header {
     background-color: #e9ecef;
 }
 
+header a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
 nav {
     display: flex;
     align-items: center;
@@ -231,21 +239,14 @@ footer {
 
 .details-right {
     flex: 1;
-    margin-top: 20px;
 }
 
-/* BACK LINK */
 .back-link a {
     text-decoration: none;
     color: #555;
     font-size: 14px;
 }
 
-.back-link a:hover {
-    text-decoration: underline;
-}
-
-/* IMAGE */
 .main-image {
     width: 100%;
     height: 250px;
@@ -253,7 +254,6 @@ footer {
     margin: 15px 0;
 }
 
-/* THUMBNAILS */
 .thumbnail-row {
     display: flex;
     gap: 10px;
@@ -268,20 +268,26 @@ footer {
 .arrow {
     padding: 15px;
     border: 1px solid #ccc;
-    cursor: pointer;
 }
 
-/* AMENITIES */
 .amenities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 20px;
+    margin: 15px 0;
+}
+
+.amenity {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    border-right: 1px solid #ccc;
+    padding-right: 10px;
 }
 
-.amenities span {
-    display: inline-block;
+.amenity:nth-child(3n) {
+    border-right: none;
 }
-
 /* OWNER */
 .owner-box {
     display: flex;
