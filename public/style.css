@@ -1,0 +1,399 @@
+/* GENERAL */
+* {
+    transition: 0.2s ease;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f6f8;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #e9ecef;
+}
+
+header a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 15px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+}
+
+nav a {
+    margin-left: 20px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+nav a.active {
+    font-weight: bold;
+    border-bottom: 2px solid #333;
+}
+
+/* HERO SECTION */
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #dfe3e8;
+}
+
+.hero h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.hero p {
+    margin-top: 15px;
+    color: #555;
+}
+
+/* WORKSPACES SECTION */
+.section-title {
+    text-align: center;
+    margin: 30px 0;
+    font-weight: bold;
+}
+
+.workspace-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 180px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    cursor: pointer;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100px;
+    background: #ddd;
+    margin-bottom: 10px;
+}
+
+.card p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.card button {
+    padding: 5px 10px;
+    background: #cfd4da;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.card button:hover {
+    background-color: #9ea7af;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    background: #e9ecef;
+    font-size: 12px;
+}
+
+/* ================= AUTH PAGES (LOGIN + REGISTER) ================= */
+
+.auth-container {
+    display: flex;
+    height: 92vh;
+}
+
+.auth-left {
+    flex: 1;
+    background-color: #aeb6bf;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    text-align: center;
+}
+
+.logo-box {
+    background: #e5e7ea;
+    padding: 70px 100px;
+    font-size: 60px;
+    font-weight: bold;
+}
+
+.auth-left h2 {
+    max-width: 550px;
+    font-size: 52px;
+    line-height: 1.1;
+}
+
+.auth-right {
+    flex: 1;
+    background-color: #e9eaec;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-box {
+    width: 420px;
+    padding: 40px;
+    background: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-box h2 {
+    text-align: center;
+}
+
+.auth-box input,
+.auth-box select {
+    padding: 12px;
+    border: 1px solid #bbb;
+    background: #f0f0f0;
+    font-size: 14px;
+}
+
+.auth-box button {
+    padding: 12px;
+    background-color: #b8c0c8;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.auth-box button:hover {
+    background-color: #9ea7af;
+}
+
+.register-link,
+.login-link {
+    text-align: center;
+    font-size: 13px;
+}
+
+.register-link a,
+.login-link a {
+    text-decoration: none;
+    color: blue;
+    font-weight: 500;
+}
+
+.register-link a:hover,
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* ================= DETAILS PAGE ================= */
+
+.details-container {
+    display: flex;
+    padding: 20px 40px;
+    gap: 30px;
+}
+
+.details-left {
+    flex: 2;
+}
+
+.details-right {
+    flex: 1;
+}
+
+.back-link a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+.main-image {
+    width: 100%;
+    height: 250px;
+    background: #ddd;
+    margin: 15px 0;
+}
+
+.thumbnail-row {
+    display: flex;
+    gap: 10px;
+}
+
+.thumb {
+    width: 80px;
+    height: 60px;
+    background: #ccc;
+}
+
+.arrow {
+    padding: 15px;
+    border: 1px solid #ccc;
+}
+
+.amenities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px 20px;
+    margin: 15px 0;
+}
+
+.amenity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-right: 1px solid #ccc;
+    padding-right: 10px;
+}
+
+.amenity:nth-child(3n) {
+    border-right: none;
+}
+/* OWNER */
+.owner-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 15px 0;
+    cursor: pointer;
+    background: #f8f8f8;
+}
+
+.owner-box:hover {
+    background: #f0f0f0;
+}
+
+/* REVIEWS */
+.review-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* BOOKING BOX */
+.booking-box {
+    border: 1px solid #ccc;
+    padding: 20px;
+    background: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* DATE INPUT */
+.booking-box input {
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+/* TIME DROPDOWNS */
+.time-row {
+    display: flex;
+    gap: 10px;
+}
+
+.time-row select {
+    padding: 6px;
+}
+
+/* PRICE SECTION */
+.price-box {
+    font-size: 14px;
+}
+
+.price-box p {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.price-box hr {
+    margin: 10px 0;
+}
+
+/* BOOK BUTTON */
+.book-btn {
+    width: 100%;
+    padding: 12px;
+    background: #9e9e9e;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.book-btn:hover {
+    background: #7f7f7f;
+}
+
+/* NOTE TEXT */
+.note {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+}
+
+/* CALENDAR */
+.calendar-box {
+    border: 1px solid #ccc;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.calendar-grid span {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+.calendar-grid span:hover {
+    background: #ddd;
+    cursor: pointer;
+}
