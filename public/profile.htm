@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Profile - Workspace App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <h2>LOGO</h2>
+    <nav>
+        <a href="index.html">Back to Home</a>
+        <a href="#">My Bookings</a>
+    </nav>
+</header>
+
+<!-- PROFILE CONTAINER -->
+<div class="profile-container">
+
+    <p class="profile-role">Owner</p>
+
+    <!-- PERSONAL INFORMATION SECTION -->
+    <div class="profile-section">
+        <h3>Personal Information</h3>
+
+        <div class="profile-form">
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-full" placeholder="Phone Number">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="email" class="profile-input-full" placeholder="Email Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-full" placeholder="Street Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-half" placeholder="City">
+                <input type="text" class="profile-input-half" placeholder="Zip Code">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-half" placeholder="Province">
+                <input type="text" class="profile-input-half" placeholder="Country">
+            </div>
+
+            <button class="profile-add-btn">+ Add Payment Method</button>
+
+        </div>
+    </div>
+
+    <!-- ADD NEW PROPERTY SECTION -->
+    <div class="profile-section">
+        <h3>Add New Property</h3>
+
+        <div class="profile-form">
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-full" placeholder="Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-half" placeholder="Neighbourhood">
+                <input type="text" class="profile-input-half" placeholder="Sq. Feet">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" class="profile-input-half" placeholder="Sq. Feet">
+            </div>
+
+            <div class="profile-form-row">
+                <label class="profile-checkbox-label">
+                    <input type="checkbox"> Parking
+                </label>
+                <label class="profile-checkbox-label">
+                    <input type="checkbox"> Public Transport
+                </label>
+            </div>
+
+            <button class="profile-add-btn">+ Add Property</button>
+
+        </div>
+    </div>
+
+    <!-- YOUR PROPERTIES SECTION -->
+    <div class="profile-section">
+        <h3>Your Properties</h3>
+
+        <table class="profile-table">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Sq. Ft</th>
+                    <th>Actions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Address</td>
+                    <td>1000</td>
+                    <td><a href="#" class="profile-action-link">Edit</a></td>
+                    <td><a href="#" class="profile-action-link">Delete</a></td>
+                </tr>
+                <tr>
+                    <td>Neighbourhood</td>
+                    <td>1000</td>
+                    <td><a href="#" class="profile-action-link">Edit</a></td>
+                    <td><a href="#" class="profile-action-link">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+    Contact | Terms | Privacy | 2026 Workspace App
+</footer>
+
+</body>
+</html>

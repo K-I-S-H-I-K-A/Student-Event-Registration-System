@@ -127,9 +127,12 @@ nav a.active {
 footer {
     text-align: center;
     padding: 10px;
-    margin-top: 20px;
     background: #e9ecef;
     font-size: 12px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
 
 /* ================= AUTH PAGES (LOGIN + REGISTER) ================= */
@@ -500,4 +503,115 @@ footer {
 .location {
     font-weight: bold;
     margin-bottom: 5px;
+}
+
+/* ================= PROFILE PAGE ================= */
+
+.profile-container {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.profile-role {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.profile-section {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.profile-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.profile-form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.profile-input-full {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.profile-input-half {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #f9f9f9;
+}
+
+.profile-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-add-btn {
+    align-self: flex-start;
+    padding: 8px 18px;
+    background-color: #5b8dd9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-add-btn:hover {
+    background-color: #4a76c0;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.profile-table th,
+.profile-table td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-table th {
+    font-weight: bold;
+    color: #555;
+    background-color: #f5f5f5;
+}
+
+.profile-action-link {
+    text-decoration: none;
+    color: #5b8dd9;
+    font-size: 13px;
+}
+
+.profile-action-link:hover {
+    text-decoration: underline;
 }
