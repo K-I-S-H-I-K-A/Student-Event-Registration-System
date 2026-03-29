@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,49 +11,50 @@
 
 <body>
 
-<div class="auth-container">
+    <div class="auth-container">
 
-    <!-- LEFT -->
-    <div class="auth-left">
-        <div class="logo-box">LOGO</div>
+        <!-- LEFT -->
+        <div class="auth-left">
+            <div class="logo-box">LOGO</div>
 
-        <h2>
-            Find Your <br>
-            Perfect Workspace <br>
-            Anytime, Anywhere
-        </h2>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="auth-right">
-        <div class="auth-box">
-            <h2>Create a New Account</h2>
-
-            <input type="email" id="email" placeholder="Email">
-            <input type="text" id="name" placeholder="Full Name">
-            <input type="text" id="phone" placeholder="Phone Number">
-            <input type="password" id="password" placeholder="Password">
-
-            <select id="role">
-                <option value="user">User</option>
-                <option value="owner">Owner</option>
-            </select>
-
-            <button type="button" onclick="registerUser()">CREATE ACCOUNT</button>
-
-            <p class="login-link">
-                Already have an account? <a href="login.html">Login</a>
-            </p>
+            <h2>
+                Find Your <br>
+                Perfect Workspace <br>
+                Anytime, Anywhere
+            </h2>
         </div>
+
+        <!-- RIGHT -->
+        <div class="auth-right">
+            <div class="auth-box">
+                <h2>Create a New Account</h2>
+
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="text" id="name" placeholder="Full Name" required>
+                <input type="text" id="phone" placeholder="Phone Number" required>
+                <input type="password" id="password" placeholder="Password" required>
+
+                <select id="role">
+                    <option value="user">User</option>
+                    <option value="owner">Owner</option>
+                </select>
+
+                <button type="button" onclick="registerUser()">CREATE ACCOUNT</button>
+                
+                <p class="login-link">  
+                    Already have an account? <a href="login.html">Login</a>
+                </p>
+            </div>
+        </div>
+
     </div>
 
-</div>
+    <footer>
+        Contact | Terms | Privacy | 2026 Workspace App
+    </footer>
 
-<footer>
-    Contact | Terms | Privacy | 2026 Workspace App
-</footer>
-
-<script src="app.js"></script>
+    <script src="app.js"></script>
 
 </body>
+
 </html>
