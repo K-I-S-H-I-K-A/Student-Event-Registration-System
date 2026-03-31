@@ -1,27 +1,6 @@
 let allBookings = [];
 let allProperties = [];
 
-const dummyProperties = [
-    {
-        id: 1,
-        workspace: "Workspace A",
-        address: "123 Place Street",
-        date: "2026-03-18",
-        owner: "John Doe",
-        price: 75,
-        status: "upcoming"
-    },
-    {
-        id: 2,
-        workspace: "Workspace B",
-        address: "456 Place Street",
-        date: "2026-03-20",
-        owner: "John Doe",
-        price: 100,
-        status: "pending"
-    }
-];
-
 function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -178,13 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function savePersonalInfo() {
     const info = {
-        phone:    document.getElementById('profile-phone')?.value || '',
-        email:    document.getElementById('profile-email')?.value || '',
-        address:  document.getElementById('profile-address')?.value || '',
-        city:     document.getElementById('profile-city')?.value || '',
-        zip:      document.getElementById('profile-zip')?.value || '',
+        phone: document.getElementById('profile-phone')?.value || '',
+        email: document.getElementById('profile-email')?.value || '',
+        address: document.getElementById('profile-address')?.value || '',
+        city: document.getElementById('profile-city')?.value || '',
+        zip: document.getElementById('profile-zip')?.value || '',
         province: document.getElementById('profile-province')?.value || '',
-        country:  document.getElementById('profile-country')?.value || ''
+        country: document.getElementById('profile-country')?.value || ''
     };
     localStorage.setItem('personalInfo', JSON.stringify(info));
     setPersonalInfoMode('view');
@@ -214,23 +193,23 @@ function loadPersonalInfo() {
     const saved = JSON.parse(localStorage.getItem('personalInfo') || 'null');
     if (!saved) return;
 
-    const phone    = document.getElementById('profile-phone');
-    const email    = document.getElementById('profile-email');
-    const address  = document.getElementById('profile-address');
-    const city     = document.getElementById('profile-city');
-    const zip      = document.getElementById('profile-zip');
+    const phone = document.getElementById('profile-phone');
+    const email = document.getElementById('profile-email');
+    const address = document.getElementById('profile-address');
+    const city = document.getElementById('profile-city');
+    const zip = document.getElementById('profile-zip');
     const province = document.getElementById('profile-province');
-    const country  = document.getElementById('profile-country');
+    const country = document.getElementById('profile-country');
 
     if (!phone) return; // not on profile page
 
-    phone.value    = saved.phone    || '';
-    email.value    = saved.email    || '';
-    address.value  = saved.address  || '';
-    city.value     = saved.city     || '';
-    zip.value      = saved.zip      || '';
+    phone.value = saved.phone || '';
+    email.value = saved.email || '';
+    address.value = saved.address || '';
+    city.value = saved.city || '';
+    zip.value = saved.zip || '';
     province.value = saved.province || '';
-    country.value  = saved.country  || '';
+    country.value = saved.country || '';
 
     setPersonalInfoMode('view');
 }
@@ -416,22 +395,35 @@ async function loadProperties() {
         const res = await fetch('/api/properties');
         const properties = await res.json();
 
-        allProperties = (properties && properties.length > 0)
-            ? properties
-            : dummyProperties;
+        allProperties = properties || [];
 
         displayProperties(allProperties);
 
     } catch (err) {
         console.error("Error loading properties:", err);
-        allProperties = dummyProperties;
-        displayProperties(allProperties);
+
+        allProperties = [];
+        displayProperties([]);
     }
 }
 
 function displayProperties(properties) {
     const container = document.getElementById("workspace-list");
+
+    if (!container) return;
+
     container.innerHTML = "";
+
+    // SHOW MESSAGE IF EMPTY
+    if (!properties || properties.length === 0) {
+        container.innerHTML = `
+        <div style="text-align:center; padding:40px;">
+            <h3>No Workplaces Available</h3>
+            <p>Check back later or add a new workspace.</p>
+        </div>
+    `;
+        return;
+    }
 
     properties.forEach(p => {
         const card = document.createElement("div");
@@ -442,11 +434,15 @@ function displayProperties(properties) {
             <p><strong>${p.workspace}</strong></p>
             <p>${p.address}</p>
             <p>$${p.price}/hr</p>
-            <button>Book Now</button>
+            <button onclick="goToDetails(${p.id})">Book Now</button>
         `;
 
         container.appendChild(card);
     });
+}
+
+function goToDetails(id) {
+    window.location.href = `workplace-details.html?id=${id}`;
 }
 
 function handleSearch() {
@@ -460,7 +456,11 @@ function handleSearch() {
         return;
     }
 
-    // use allProperties instead of undefined "properties"
+    if (!allProperties || allProperties.length === 0) {
+        dropdown.style.display = "none";
+        return;
+    }
+
     const filtered = allProperties.filter(p =>
         p.workspace.toLowerCase().includes(input) ||
         p.address.toLowerCase().includes(input)
@@ -481,7 +481,6 @@ function handleSearch() {
             document.getElementById("searchInput").value = p.workspace;
             dropdown.style.display = "none";
 
-            // Redirect to details page with property ID
             window.location.href = `workplace-details.html?id=${p.id}`;
         };
 
@@ -500,18 +499,14 @@ function loadPropertyDetails() {
         return;
     }
 
-    // Use API first, fallback to dummy data
     fetch('/api/properties')
         .then(res => res.json())
         .then(properties => {
-            const all = (properties && properties.length > 0)
-                ? properties
-                : dummyProperties;
-
-            const property = all.find(p => p.id === id);
+            const property = properties.find(p => p.id === id);
 
             if (!property) {
-                console.error("Property not found");
+                document.querySelector(".details-container").innerHTML =
+                    "<p>Property not found</p>";
                 return;
             }
 
@@ -519,10 +514,6 @@ function loadPropertyDetails() {
         })
         .catch(err => {
             console.error(err);
-
-            // fallback to dummy
-            const property = dummyProperties.find(p => p.id === id);
-            if (property) renderPropertyDetails(property);
         });
 }
 
@@ -589,15 +580,61 @@ function updatePricing() {
     `;
 }
 
+async function bookNow() {
+    const userId = localStorage.getItem("userId");
+
+    // Get propertyId from URL
+    const params = new URLSearchParams(window.location.search);
+    const propertyId = parseInt(params.get("id"));
+
+    const date = document.getElementById("bookingDate").value;
+    const startTime = document.getElementById("startTime").value;
+    const duration = document.getElementById("duration").value;
+
+    if (!userId) {
+        alert("Please log in first");
+        return;
+    }
+
+    if (!date || !startTime || !duration) {
+        alert("Please fill in all booking details");
+        return;
+    }
+
+    const bookingData = {
+        userId: parseInt(userId),
+        propertyId,
+        date,
+        startTime,
+        duration: parseInt(duration)
+    };
+
+    try {
+        const res = await fetch("http://localhost:3000/book", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bookingData)
+        });
+
+        const result = await res.json();
+        console.log(result);
+
+        alert("Booking successful!");
+    } catch (err) {
+        console.error(err);
+        alert("Booking failed");
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateAuthButton();
 
-    // Only run on homepage
     if (document.getElementById("workspace-list")) {
         loadProperties();
     }
 
-    // Only run on bookings page
     if (document.getElementById("bookings-list")) {
         loadBookings();
     }
@@ -605,5 +642,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const durationSelect = document.getElementById("duration");
     if (durationSelect) {
         durationSelect.addEventListener("change", updatePricing);
+    }
+
+    const bookBtn = document.getElementById("bookNowBtn");
+    if (bookBtn) {
+        bookBtn.addEventListener("click", bookNow);
     }
 });
