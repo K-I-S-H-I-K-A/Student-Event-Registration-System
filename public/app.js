@@ -56,8 +56,37 @@ function registerUser() {
         });
 }
 
-async function loadBookings() {
+function updateAuthButton() {
+    const authBtn = document.getElementById("auth-btn");
     const userId = localStorage.getItem("userId");
+
+    if (!authBtn) return;
+
+    if (userId && userId !== "0") {
+        authBtn.textContent = "Logout";
+    } else {
+        authBtn.textContent = "Sign In";
+    }
+}
+
+function handleAuth() {
+    const userId = localStorage.getItem("userId");
+
+    if (userId && userId !== "0") {
+        // LOGOUT
+        localStorage.removeItem("userId");
+
+        updateAuthButton();
+
+        window.location.reload();
+    } else {
+        // GO TO LOGIN
+        window.location.href = "login.html";
+    }
+}
+
+async function loadBookings() {
+    const userId = localStorage.getItem("userId") || "0";
 
     if (!userId) {
         console.error("No userId found. User may not be logged in.");
@@ -108,3 +137,5 @@ function displayBookings(bookings) {
         container.appendChild(div);
     });
 }
+
+document.addEventListener("DOMContentLoaded", updateAuthButton);
