@@ -130,7 +130,7 @@ function displayBookings(bookings) {
         div.innerHTML = `
             <div class="booking-content">
                 <div class="image-placeholder"></div>
-                
+
                 <div class="details">
                     <h3>${b.workspace}</h3>
                     <p class="location">${b.address}</p>
@@ -139,6 +139,11 @@ function displayBookings(bookings) {
                 </div>
             </div>
         `;
+
+        div.style.cursor = 'pointer';
+        div.onclick = () => {
+            window.location.href = `workplace-details.html?id=${b.id}`;
+        };
 
         container.appendChild(div);
     });
@@ -436,6 +441,10 @@ function displayProperties(properties) {
             <p>$${p.price}/hr</p>
             <button onclick="goToDetails(${p.id})">Book Now</button>
         `;
+
+        card.onclick = () => {
+            window.location.href = `workplace-details.html?id=${p.id}`;
+        };
 
         container.appendChild(card);
     });
