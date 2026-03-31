@@ -475,13 +475,13 @@ function renderPropertyDetails(p) {
     document.getElementById("ownerName").textContent = p.owner;
     document.getElementById("ownerRole").textContent = "Host";
 
-    // ✅ Description
+    // Description
     const descEl = document.getElementById("propertyDescription");
     if (descEl) {
         descEl.textContent = p.description || "No description available.";
     }
 
-    // ✅ Amenities
+    // Amenities
     const amenitiesContainer = document.getElementById("amenitiesList");
     if (amenitiesContainer) {
         amenitiesContainer.innerHTML = "";
