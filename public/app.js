@@ -90,15 +90,21 @@ function displayBookings(bookings) {
     bookings.forEach(b => {
         const div = document.createElement("div");
 
+        div.className = "booking";
+
         div.innerHTML = `
-            <h3>${b.workspace}</h3>
-            <p>${b.address}</p>
-            <p>${b.date}</p>
-            <p>Status: ${b.status}</p>
-            <hr>
+            <div class="booking-content">
+                <div class="image-placeholder"></div>
+                
+                <div class="details">
+                    <h3>${b.workspace}</h3>
+                    <p class="location">${b.address}</p>
+                    <p>${b.date}</p>
+                    <p>Status: ${b.status}</p>
+                </div>
+            </div>
         `;
 
         container.appendChild(div);
     });
 }
-
