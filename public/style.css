@@ -831,6 +831,13 @@ footer {
     cursor: default;
 }
 
+.personal-info-input:disabled {
+    background: #efefef;
+    color: #444;
+    cursor: default;
+    border-color: #ddd;
+}
+
 .payment-cancel-btn {
     padding: 8px 18px;
     background: none;
