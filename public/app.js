@@ -138,4 +138,160 @@ function displayBookings(bookings) {
     });
 }
 
-document.addEventListener("DOMContentLoaded", updateAuthButton);
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthButton();
+    // Load saved payment methods and render them if on the profile page
+    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    renderPaymentMethods();
+});
+
+// ===== PAYMENT METHOD MODAL =====
+
+let paymentMethods = [];
+let editingPaymentIndex = null;
+
+function openPaymentModal(editIndex) {
+    editingPaymentIndex = (editIndex !== undefined) ? editIndex : null;
+
+    const title = document.querySelector('.payment-modal-header h3');
+    const confirmBtn = document.querySelector('.payment-confirm-btn');
+    const deleteBtn = document.getElementById('payment-delete-btn');
+
+    // Reset form to defaults
+    document.querySelector('input[name="payment-type"][value="credit-card"]').checked = true;
+    document.getElementById('payment-card-number').value = '';
+    document.getElementById('payment-expiry').value = '';
+    document.getElementById('payment-cvc').value = '';
+    document.getElementById('payment-paypal-email').value = '';
+    toggleCardFields();
+
+    if (editingPaymentIndex !== null) {
+        // Pre-fill for editing
+        title.textContent = 'Edit Payment Method';
+        confirmBtn.textContent = 'Save';
+        deleteBtn.style.display = 'block';
+        const m = paymentMethods[editingPaymentIndex];
+        if (m.type === 'credit-card') {
+            document.querySelector('input[name="payment-type"][value="credit-card"]').checked = true;
+            document.getElementById('payment-card-number').value = m.cardNumber;
+            document.getElementById('payment-expiry').value = m.expiry;
+        } else {
+            document.querySelector('input[name="payment-type"][value="paypal"]').checked = true;
+            document.getElementById('payment-paypal-email').value = m.email;
+        }
+        toggleCardFields();
+    } else {
+        title.textContent = 'Add a Payment Method';
+        confirmBtn.textContent = 'Add';
+        deleteBtn.style.display = 'none';
+    }
+
+    document.getElementById("payment-overlay").classList.add("active");
+}
+
+function deletePaymentMethod() {
+    const confirmed = confirm("Are you sure you want to delete it?");
+    if (confirmed) {
+        paymentMethods.splice(editingPaymentIndex, 1);
+        localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+        renderPaymentMethods();
+        closePaymentModal();
+    }
+    // If cancelled, stay in the modal
+}
+
+function closePaymentModal() {
+    document.getElementById("payment-overlay").classList.remove("active");
+}
+
+function handleOverlayClick(event) {
+    // Close if user clicks the backdrop (not the modal itself)
+    if (event.target === document.getElementById("payment-overlay")) {
+        closePaymentModal();
+    }
+}
+
+function toggleCardFields() {
+    const selected = document.querySelector('input[name="payment-type"]:checked').value;
+    document.getElementById("payment-card-fields").style.display =
+        selected === "credit-card" ? "flex" : "none";
+    document.getElementById("payment-paypal-fields").style.display =
+        selected === "paypal" ? "flex" : "none";
+}
+
+function savePaymentMethod() {
+    const type = document.querySelector('input[name="payment-type"]:checked').value;
+    let method;
+
+    if (type === 'credit-card') {
+        const cardNumber = document.getElementById('payment-card-number').value.trim();
+        const expiry = document.getElementById('payment-expiry').value.trim();
+        const cvc = document.getElementById('payment-cvc').value.trim();
+        if (!cardNumber || !expiry || !cvc) return;
+        method = {
+            type: 'credit-card',
+            cardNumber,
+            last4: cardNumber.replace(/\s/g, '').slice(-4),
+            expiry
+        };
+    } else {
+        const email = document.getElementById('payment-paypal-email').value.trim();
+        if (!email) return;
+        method = { type: 'paypal', email };
+    }
+
+    if (editingPaymentIndex !== null) {
+        paymentMethods[editingPaymentIndex] = method;
+    } else {
+        paymentMethods.push(method);
+    }
+
+    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    renderPaymentMethods();
+    closePaymentModal();
+}
+
+function renderPaymentMethods() {
+    const list = document.getElementById('payment-methods-list');
+    const subsection = document.getElementById('payment-methods-subsection');
+    const addBtn = document.getElementById('payment-add-btn');
+
+    if (!list) return;
+
+    if (paymentMethods.length === 0) {
+        subsection.style.display = 'none';
+        if (addBtn) addBtn.textContent = '+ Add Payment Method';
+        return;
+    }
+
+    subsection.style.display = 'block';
+
+    const creditCardCount = paymentMethods.filter(m => m.type === 'credit-card').length;
+    if (addBtn) {
+        if (creditCardCount >= 3) {
+            addBtn.textContent = 'Limit of payment method reached';
+            addBtn.disabled = true;
+        } else {
+            addBtn.textContent = '+ Add more payment methods';
+            addBtn.disabled = false;
+        }
+    }
+
+    list.innerHTML = '';
+    paymentMethods.forEach((m, i) => {
+        const div = document.createElement('div');
+        div.className = 'payment-saved-item';
+        if (m.type === 'credit-card') {
+            div.innerHTML = `
+                <span>Credit Card &nbsp;&bull;&bull;&bull;&bull; ${m.last4} &nbsp;&mdash;&nbsp; Exp: ${m.expiry}</span>
+                <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
+            `;
+        } else {
+            div.innerHTML = `
+                <span>PayPal &nbsp;&mdash;&nbsp; ${m.email}</span>
+                <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
+            `;
+        }
+        list.appendChild(div);
+    });
+}

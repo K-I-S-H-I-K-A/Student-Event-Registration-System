@@ -14,7 +14,7 @@
     <h2>LOGO</h2>
     <nav>
         <a href="index.html">Back to Home</a>
-        <a href="#">My Bookings</a>
+        <a href="my_bookings.html">My Bookings</a>
     </nav>
 </header>
 
@@ -51,7 +51,13 @@
                 <input type="text" class="profile-input-half" placeholder="Country">
             </div>
 
-            <button class="profile-add-btn">+ Add Payment Method</button>
+            <!-- PAYMENT METHODS SUBSECTION -->
+            <div class="profile-subsection" id="payment-methods-subsection">
+                <h4 class="profile-subsection-title">Payment Methods</h4>
+                <div id="payment-methods-list"></div>
+            </div>
+
+            <button id="payment-add-btn" class="profile-add-btn" onclick="openPaymentModal()">+ Add Payment Method</button>
 
         </div>
     </div>
@@ -122,10 +128,56 @@
 
 </div>
 
+<!-- PAYMENT METHOD MODAL -->
+<div class="payment-overlay" id="payment-overlay" onclick="handleOverlayClick(event)">
+    <div class="payment-modal">
+
+        <div class="payment-modal-header">
+            <h3>Add a Payment Method</h3>
+            <button class="payment-close-btn" onclick="closePaymentModal()">&#x2715;</button>
+        </div>
+
+        <div class="payment-method-options">
+            <label class="payment-option">
+                <input type="radio" name="payment-type" value="credit-card" checked onchange="toggleCardFields()"> Credit Card
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="payment-type" value="paypal" onchange="toggleCardFields()"> PayPal
+            </label>
+        </div>
+
+        <div class="payment-card-fields" id="payment-card-fields">
+            <div class="payment-field-row">
+                <input type="text" id="payment-card-number" class="payment-input-full" placeholder="Card Number" maxlength="19">
+            </div>
+            <div class="payment-field-row">
+                <input type="text" id="payment-expiry" class="payment-input-half" placeholder="Expiry Date (MM/YY)" maxlength="5">
+                <input type="text" id="payment-cvc" class="payment-input-half" placeholder="CVC" maxlength="3">
+            </div>
+        </div>
+
+        <div class="payment-paypal-fields" id="payment-paypal-fields">
+            <div class="payment-field-row">
+                <input type="email" id="payment-paypal-email" class="payment-input-full" placeholder="PayPal Email">
+            </div>
+        </div>
+
+        <div class="payment-btn-row">
+            <button id="payment-delete-btn" class="payment-delete-btn" onclick="deletePaymentMethod()">Delete</button>
+            <div class="payment-btn-right">
+                <button class="payment-cancel-btn" onclick="closePaymentModal()">Cancel</button>
+                <button class="payment-confirm-btn" onclick="savePaymentMethod()">Add</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
     Contact | Terms | Privacy | 2026 Workspace App
 </footer>
 
+<script src="/app.js"></script>
 </body>
 </html>
