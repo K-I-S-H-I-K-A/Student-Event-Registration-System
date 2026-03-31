@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "workspace": "Workspace A",
+    "address": "123 Place Street",
+    "date": "2026-03-18",
+    "status": "upcoming"
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "workspace": "Workspace B",
+    "address": "456 Place Street",
+    "date": "2026-03-20",
+    "status": "pending"
+  }
+]

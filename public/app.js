@@ -7,19 +7,23 @@ function login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Login successful!");
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Login successful!");
 
-            localStorage.setItem("loggedInUser", email);
+                localStorage.setItem("userId", data.id);
 
-            // Redirect
-            window.location.href = "index.html";
-        } else {
-            alert("Invalid email or password");
-        }
-    });
+                // Redirect
+                window.location.href = "index.html";
+            } else {
+                alert("Invalid email or password");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Server error");
+        });
 }
 
 function registerUser() {
@@ -36,18 +40,65 @@ function registerUser() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert("Account created!");
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Account created!");
 
-            window.location.href = "login.html";
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Server error");
+                window.location.href = "login.html";
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Server error");
+        });
+}
+
+async function loadBookings() {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+        console.error("No userId found. User may not be logged in.");
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/bookings?userId=${userId}`);
+        const bookings = await res.json();
+
+        displayBookings(bookings);
+
+    } catch (err) {
+        console.error("Error fetching bookings:", err);
+    }
+}
+
+function displayBookings(bookings) {
+    const container = document.getElementById("bookings-list");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    if (bookings.length === 0) {
+        container.innerHTML = "<p>No bookings found.</p>";
+        return;
+    }
+
+    bookings.forEach(b => {
+        const div = document.createElement("div");
+
+        div.innerHTML = `
+            <h3>${b.workspace}</h3>
+            <p>${b.address}</p>
+            <p>${b.date}</p>
+            <p>Status: ${b.status}</p>
+            <hr>
+        `;
+
+        container.appendChild(div);
     });
 }
+

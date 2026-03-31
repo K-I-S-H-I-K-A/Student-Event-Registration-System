@@ -32,6 +32,16 @@ const server = http.createServer((req, res) => {
                     }));
                 }
 
+                // Generate next ID
+                let nextId = 1;
+
+                if (users.length > 0) {
+                    nextId = Math.max(...users.map(u => u.id || 0)) + 1;
+                }
+
+                // Assign ID to new user
+                newUser.id = nextId;
+
                 users.push(newUser);
 
                 fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
@@ -73,7 +83,8 @@ const server = http.createServer((req, res) => {
                 if (user) {
                     res.end(JSON.stringify({
                         success: true,
-                        role: user.role
+                        role: user.role,
+                        id: user.id
                     }));
                 } else {
                     res.end(JSON.stringify({ success: false }));
@@ -86,6 +97,26 @@ const server = http.createServer((req, res) => {
         });
     }
 
+    // ===== GET BOOKINGS FOR USER =====
+    else if (req.method === 'GET' && req.url.startsWith('/api/bookings')) {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const userId = parseInt(url.searchParams.get('userId'));
+
+        const bookingsFile = path.join(__dirname, 'data', 'properties.json');
+
+        try {
+            const data = fs.readFileSync(bookingsFile, 'utf-8');
+            const bookings = data ? JSON.parse(data) : [];
+
+            const userBookings = bookings.filter(b => Number(b.userId) === userId);
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(userBookings));
+        } catch (error) {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
+    }
     // ===== SERVE FRONTEND FILES =====
     else {
         let filePath = path.join(

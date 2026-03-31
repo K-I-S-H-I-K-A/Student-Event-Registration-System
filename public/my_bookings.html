@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body onload="loadBookings()">
 
 <!-- HEADER -->
 <header>
     <h2>LOGO</h2>
     <nav>
-        <a href="#">Home</a>
+        <a href="index.html">Home</a>
         <a href="#" class="active">Bookings</a>
         <a href="#">Profile</a>
     </nav>
@@ -21,6 +21,7 @@
 
 <div class="my-bookings">
 
+    <!-- TOP BAR -->
     <div class="top-bar">
         <h1>My Bookings</h1>
 
@@ -35,19 +36,19 @@
 
         <div class="card">
             <h4>UPCOMING</h4>
-            <h2>3</h2>
-            <p>Next: Mar 18</p>
+            <h2 id="upcoming-count">0</h2>
+            <p id="next-booking">Next: -</p>
         </div>
 
         <div class="card">
             <h4>PENDING</h4>
-            <h2>4</h2>
+            <h2 id="pending-count">0</h2>
             <p>Awaiting Confirmation</p>
         </div>
 
         <div class="card">
             <h4>COMPLETED</h4>
-            <h2>5</h2>
+            <h2 id="completed-count">0</h2>
         </div>
 
         <div class="card">
@@ -57,38 +58,8 @@
 
     </div>
 
-    <!-- BOOKINGS -->
-    <div class="booking">
-        <h3>Workspace A</h3>
-
-        <div class="booking-content">
-            <div class="image-placeholder"></div>
-
-            <div class="details">
-                <p class="location">📍 123 Place Street, Cityname, ST, 1A2 B3C</p>
-                <p>
-                    Description: Praeterea, ex culpa non invenies unum aut non accusatis unum.
-                    Et nihil iuvant. Nemo nocere tibi erit, et non inimicos.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="booking">
-        <h3>Workspace B</h3>
-
-        <div class="booking-content">
-            <div class="image-placeholder"></div>
-
-            <div class="details">
-                <p class="location">📍 456 Place Street, Cityname, ST, 4A5 B6C</p>
-                <p>
-                    Description: Praeterea, ex culpa non invenies unum aut non accusatis unum.
-                    Et nihil iuvant. Nemo nocere tibi erit, et non inimicos.
-                </p>
-            </div>
-        </div>
-    </div>
+    <!-- BOOKINGS (DYNAMIC) -->
+    <div id="bookings-list"></div>
 
 </div>
 
@@ -96,6 +67,8 @@
 <footer>
     <p>Contact | Terms | Privacy | Workspace 2026</p>
 </footer>
+
+<script src="/app.js"></script>
 
 </body>
 </html>
