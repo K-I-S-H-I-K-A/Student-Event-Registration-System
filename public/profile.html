@@ -30,26 +30,28 @@
         <div class="profile-form">
 
             <div class="profile-form-row">
-                <input type="text" class="profile-input-full" placeholder="Phone Number">
+                <input type="text" id="profile-phone" class="profile-input-full personal-info-input" placeholder="Phone Number">
             </div>
 
             <div class="profile-form-row">
-                <input type="email" class="profile-input-full" placeholder="Email Address">
+                <input type="email" id="profile-email" class="profile-input-full personal-info-input" placeholder="Email Address">
             </div>
 
             <div class="profile-form-row">
-                <input type="text" class="profile-input-full" placeholder="Street Address">
+                <input type="text" id="profile-address" class="profile-input-full personal-info-input" placeholder="Street Address">
             </div>
 
             <div class="profile-form-row">
-                <input type="text" class="profile-input-half" placeholder="City">
-                <input type="text" class="profile-input-half" placeholder="Zip Code">
+                <input type="text" id="profile-city" class="profile-input-half personal-info-input" placeholder="City">
+                <input type="text" id="profile-zip" class="profile-input-half personal-info-input" placeholder="Zip Code">
             </div>
 
             <div class="profile-form-row">
-                <input type="text" class="profile-input-half" placeholder="Province">
-                <input type="text" class="profile-input-half" placeholder="Country">
+                <input type="text" id="profile-province" class="profile-input-half personal-info-input" placeholder="Province">
+                <input type="text" id="profile-country" class="profile-input-half personal-info-input" placeholder="Country">
             </div>
+
+            <button id="personal-info-btn" class="profile-add-btn" onclick="savePersonalInfo()">Save</button>
 
             <!-- PAYMENT METHODS SUBSECTION -->
             <div class="profile-subsection" id="payment-methods-subsection">

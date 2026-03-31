@@ -143,7 +143,70 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load saved payment methods and render them if on the profile page
     paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
     renderPaymentMethods();
+    // Load saved personal info if on the profile page
+    loadPersonalInfo();
 });
+
+// ===== PERSONAL INFORMATION =====
+
+function savePersonalInfo() {
+    const info = {
+        phone:    document.getElementById('profile-phone')?.value || '',
+        email:    document.getElementById('profile-email')?.value || '',
+        address:  document.getElementById('profile-address')?.value || '',
+        city:     document.getElementById('profile-city')?.value || '',
+        zip:      document.getElementById('profile-zip')?.value || '',
+        province: document.getElementById('profile-province')?.value || '',
+        country:  document.getElementById('profile-country')?.value || ''
+    };
+    localStorage.setItem('personalInfo', JSON.stringify(info));
+    setPersonalInfoMode('view');
+}
+
+function editPersonalInfo() {
+    setPersonalInfoMode('edit');
+}
+
+function setPersonalInfoMode(mode) {
+    const inputs = document.querySelectorAll('.personal-info-input');
+    const btn = document.getElementById('personal-info-btn');
+    if (!btn) return;
+
+    if (mode === 'view') {
+        inputs.forEach(el => el.disabled = true);
+        btn.textContent = 'Edit';
+        btn.onclick = editPersonalInfo;
+    } else {
+        inputs.forEach(el => el.disabled = false);
+        btn.textContent = 'Save';
+        btn.onclick = savePersonalInfo;
+    }
+}
+
+function loadPersonalInfo() {
+    const saved = JSON.parse(localStorage.getItem('personalInfo') || 'null');
+    if (!saved) return;
+
+    const phone    = document.getElementById('profile-phone');
+    const email    = document.getElementById('profile-email');
+    const address  = document.getElementById('profile-address');
+    const city     = document.getElementById('profile-city');
+    const zip      = document.getElementById('profile-zip');
+    const province = document.getElementById('profile-province');
+    const country  = document.getElementById('profile-country');
+
+    if (!phone) return; // not on profile page
+
+    phone.value    = saved.phone    || '';
+    email.value    = saved.email    || '';
+    address.value  = saved.address  || '';
+    city.value     = saved.city     || '';
+    zip.value      = saved.zip      || '';
+    province.value = saved.province || '';
+    country.value  = saved.country  || '';
+
+    setPersonalInfoMode('view');
+}
 
 // ===== PAYMENT METHOD MODAL =====
 
