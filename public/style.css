@@ -7,6 +7,13 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #f5f6f8;
+    padding-bottom: 50px;
+}
+
+/* LOGO LINK */
+.logo-link {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* HEADER */
@@ -508,6 +515,11 @@ footer {
     border: 1px solid #bbb;
     background: #e1e5ea;
     border-radius: 6px;
+}
+
+.booking:hover {
+    transform: translateY(-3px);
+    cursor: pointer;
 }
 
 .booking h3 {
