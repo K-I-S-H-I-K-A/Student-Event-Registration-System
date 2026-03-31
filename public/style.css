@@ -615,3 +615,50 @@ footer {
 .profile-action-link:hover {
     text-decoration: underline;
 }
+
+/* ================= ABOUT US PAGE ================= */
+
+.about-hero {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #dfe3e8;
+}
+
+.about-hero h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.about-hero p {
+    color: #555;
+    font-size: 16px;
+}
+
+.about-container {
+    max-width: 700px;
+    margin: 30px auto 60px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-section {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.about-section h2 {
+    margin-top: 0;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.about-section p {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+    margin: 0;
+}
