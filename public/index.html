@@ -23,40 +23,19 @@
 
     <section class="hero">
         <h1>Find Your Perfect Workspace Anytime, Anywhere</h1>
-        <input class="search-box" type="text" placeholder="Search Location...">
+        <div class="search-wrapper">
+            <input id="searchInput" class="search-box" type="text" placeholder="Search Location..."
+                oninput="handleSearch()" />
+
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </div>
         <p>Browse coworking spaces, meeting rooms, and private offices for rent in your city</p>
     </section>
 
     <h3 class="section-title">Workspaces</h3>
 
-    <div class="workspace-container">
-        <div class="card">
-            <div class="image-placeholder"></div>
-            <p><strong>Desk</strong></p>
-            <p>Place, Price</p>
-            <button>Book Now</button>
-        </div>
-
-        <div class="card">
-            <div class="image-placeholder"></div>
-            <p><strong>Office</strong></p>
-            <p>Place, Price</p>
-            <button>Book Now</button>
-        </div>
-
-        <div class="card">
-            <div class="image-placeholder"></div>
-            <p><strong>Studio</strong></p>
-            <p>Place, Price</p>
-            <button>Book Now</button>
-        </div>
-
-        <div class="card">
-            <div class="image-placeholder"></div>
-            <p><strong>Meeting Room</strong></p>
-            <p>Place, Price</p>
-            <button>Book Now</button>
-        </div>
+    <div class="workspace-container" id="workspace-list">
+        <!-- Dynamic workspace cards will be inserted here -->
     </div>
 
     <!-- FOOTER -->
@@ -64,7 +43,7 @@
         Contact | Terms | Privacy | 2026 Workspace App
     </footer>
 
-<script src="/app.js"></script>
+    <script src="/app.js"></script>
 
 </body>
 

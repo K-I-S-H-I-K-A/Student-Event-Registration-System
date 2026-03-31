@@ -5,6 +5,10 @@
     "workspace": "Workspace A",
     "address": "123 Place Street",
     "date": "2026-03-18",
+    "owner": "John Doe",
+    "price": 75,
+    "amenities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
     "status": "upcoming"
   },
   {
@@ -13,6 +17,34 @@
     "workspace": "Workspace B",
     "address": "456 Place Street",
     "date": "2026-03-20",
+    "owner": "John Doe",
+    "price": 100,
+    "amenities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
+    "status": "pending"
+  },
+  {
+    "id": 3,
+    "userId": 1,
+    "workspace": "Workspace C",
+    "address": "456 Place Street",
+    "date": "2026-03-20",
+    "owner": "John Doe",
+    "price": 100,
+    "amenities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
+    "status": "pending"
+  },
+  {
+    "id": 4,
+    "userId": 1,
+    "workspace": "Workspace D",
+    "address": "456 Place Street",
+    "date": "2026-03-20",
+    "owner": "John Doe",
+    "price": 100,
+    "ameities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
     "status": "pending"
   }
 ]

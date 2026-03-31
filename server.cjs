@@ -117,12 +117,32 @@ const server = http.createServer((req, res) => {
             res.end("Server Error");
         }
     }
+
+    // ===== GET ALL PROPERTIES =====
+    else if (req.method === 'GET' && req.url === '/api/properties') {
+        const propertiesFile = path.join(__dirname, 'data', 'properties.json');
+
+        try {
+            const data = fs.readFileSync(propertiesFile, 'utf-8');
+            const properties = data ? JSON.parse(data) : [];
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(properties));
+        } catch {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
+    }
+
     // ===== SERVE FRONTEND FILES =====
     else {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const pathname = url.pathname; 
+
         let filePath = path.join(
             __dirname,
             'public',
-            req.url === '/' ? 'index.html' : req.url
+            pathname === '/' ? 'index.html' : pathname
         );
 
         const ext = path.extname(filePath);

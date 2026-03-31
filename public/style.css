@@ -66,6 +66,36 @@ nav a.active {
     border-radius: 4px;
 }
 
+.search-wrapper {
+    position: relative;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.search-dropdown {
+    position: absolute;
+    top: 45px;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+}
+
+.search-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.search-item:hover {
+    background-color: #f0f0f0;
+}
+
 .hero p {
     margin-top: 15px;
     color: #555;
@@ -268,14 +298,9 @@ footer {
     background: #ccc;
 }
 
-.arrow {
-    padding: 15px;
-    border: 1px solid #ccc;
-}
-
 .amenities {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px 20px;
     margin: 15px 0;
 }
@@ -283,9 +308,14 @@ footer {
 .amenity {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px 20px;
     border-right: 1px solid #ccc;
     padding-right: 10px;
+}
+
+.amenity p {
+    margin: 0;
+    white-space: nowrap;
 }
 
 .amenity:nth-child(3n) {
