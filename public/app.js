@@ -123,7 +123,11 @@ async function loadBookings() {
         allBookings = bookings;
         allProperties = properties;
 
-        displayBookings(bookings);
+        const sortedBookings = [...bookings].sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
+        });
+
+        displayBookings(sortedBookings);
         updateSummary(bookings);
 
     } catch (err) {
@@ -190,7 +194,11 @@ function filterBookings(type) {
         });
     }
 
-    displayBookings(filtered);
+    const sorted = [...filtered].sort((a, b) => {
+        return new Date(a.date) - new Date(b.date);
+    });
+
+    displayBookings(sorted);
 }
 
 // ===== DISPLAY BOOKINGS IN UI =====
@@ -928,9 +936,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadBookingConfirmation();
 
-    const bookingsList = document.getElementById("bookings-list"); 
-    if (bookingsList) { 
-        loadBookings(); 
+    const bookingsList = document.getElementById("bookings-list");
+    if (bookingsList) {
+        loadBookings();
     }
 
     renderCalendarSlots();
