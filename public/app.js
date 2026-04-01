@@ -89,24 +89,55 @@ function handleAuth() {
 }
 
 async function loadBookings() {
-    const userId = localStorage.getItem("userId") || "0";
-
-    if (!userId) {
-        console.error("No userId found. User may not be logged in.");
-        return;
-    }
-
     try {
-        const res = await fetch(`/api/bookings?userId=${userId}`);
-        const bookings = await res.json();
+        const userId = parseInt(localStorage.getItem("userId"));
 
-        allBookings = bookings;
+        if (!userId) {
+            console.log("No user logged in");
+            return;
+        }
 
-        displayBookings(bookings);
-        updateSummary(bookings);
+        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+        console.log("Stored bookings:", bookings);
+        console.log("Current userId:", userId);
+
+        if (bookings.length === 0) {
+            console.log("No bookings in localStorage");
+            displayBookings([]);
+            return;
+        }
+
+        const res = await fetch('/data/properties.json');
+
+        if (!res.ok) {
+            throw new Error("Failed to load properties.json");
+        }
+
+        const properties = await res.json();
+
+        const userBookings = bookings
+            .filter(b => b.userId === userId)
+            .map(b => {
+                const property = properties.find(p => p.id === b.propertyId);
+
+                return {
+                    ...b,
+                    workspace: property?.workspace || "Unknown",
+                    address: property?.address || "",
+                    status: "upcoming"
+                };
+            });
+
+        console.log("User bookings:", userBookings);
+
+        allBookings = userBookings;
+
+        displayBookings(userBookings);
+        updateSummary(userBookings);
 
     } catch (err) {
-        console.error("Error fetching bookings:", err);
+        console.error("loadBookings error:", err);
     }
 }
 
@@ -124,39 +155,69 @@ function displayBookings(bookings) {
 
     bookings.forEach(b => {
         const div = document.createElement("div");
-
         div.className = "booking";
 
         div.innerHTML = `
-            <div class="booking-content">
-                <div class="image-placeholder"></div>
+                <div class="booking-content">
+                    <div class="image-placeholder"></div>
 
-                <div class="details">
-                    <h3>${b.workspace}</h3>
-                    <p class="location">${b.address}</p>
-                    <p>${b.date}</p>
-                    <p>Status: ${b.status}</p>
+                    <div class="details">
+                        <h3>${b.workspace}</h3>
+                        <p class="location">${b.address}</p>
+                        <p>${b.date} at ${b.startTime}</p>
+                        <p>Status: ${b.status}</p>
+
+                        <button onclick="cancelBooking(${b.id})">Cancel Booking</button>
+                    </div>
                 </div>
-            </div>
-        `;
-
-        div.style.cursor = 'pointer';
-        div.onclick = () => {
-            window.location.href = `workplace-details.html?id=${b.id}`;
-        };
+            `;
 
         container.appendChild(div);
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    updateAuthButton();
-    // Load saved payment methods and render them if on the profile page
-    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-    renderPaymentMethods();
-    // Load saved personal info if on the profile page
-    loadPersonalInfo();
-});
+function cancelBooking(bookingId) {
+    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+    const updatedBookings = bookings.filter(b => b.id !== bookingId);
+
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+
+    alert("Booking cancelled");
+
+    loadBookings(); // refresh UI
+}
+
+function renderCalendarSlots() {
+    const dateInput = document.getElementById("bookingDate");
+    const container = document.getElementById("calendar-slots");
+
+    if (!dateInput || !container) return;
+
+    const date = dateInput.value;
+    if (!date) return;
+
+    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+    const propertyId = parseInt(new URLSearchParams(window.location.search).get("id"));
+
+    const propertyBookings = bookings.filter(
+        b => b.propertyId === propertyId && b.date === date
+    );
+
+    container.innerHTML = "<h4>Booked Time Slots:</h4>";
+
+    if (propertyBookings.length === 0) {
+        container.innerHTML += "<p>No bookings for this date.</p>";
+        return;
+    }
+
+    propertyBookings.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "slot";
+        div.textContent = `${b.startTime} for ${b.duration}h`;
+        container.appendChild(div);
+    });
+}
 
 // ===== PERSONAL INFORMATION =====
 
@@ -357,14 +418,14 @@ function renderPaymentMethods() {
         div.className = 'payment-saved-item';
         if (m.type === 'credit-card') {
             div.innerHTML = `
-                <span>Credit Card &nbsp;&bull;&bull;&bull;&bull; ${m.last4} &nbsp;&mdash;&nbsp; Exp: ${m.expiry}</span>
-                <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
-            `;
+                    <span>Credit Card &nbsp;&bull;&bull;&bull;&bull; ${m.last4} &nbsp;&mdash;&nbsp; Exp: ${m.expiry}</span>
+                    <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
+                `;
         } else {
             div.innerHTML = `
-                <span>PayPal &nbsp;&mdash;&nbsp; ${m.email}</span>
-                <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
-            `;
+                    <span>PayPal &nbsp;&mdash;&nbsp; ${m.email}</span>
+                    <button class="profile-action-link payment-edit-btn" onclick="openPaymentModal(${i})">Edit</button>
+                `;
         }
         list.appendChild(div);
     });
@@ -397,7 +458,12 @@ function filterBookings(type) {
 
 async function loadProperties() {
     try {
-        const res = await fetch('/api/properties');
+        const res = await fetch('/data/properties.json');
+
+        if (!res.ok) {
+            throw new Error("Failed to load properties");
+        }
+
         const properties = await res.json();
 
         allProperties = properties || [];
@@ -406,8 +472,6 @@ async function loadProperties() {
 
     } catch (err) {
         console.error("Error loading properties:", err);
-
-        allProperties = [];
         displayProperties([]);
     }
 }
@@ -422,11 +486,11 @@ function displayProperties(properties) {
     // SHOW MESSAGE IF EMPTY
     if (!properties || properties.length === 0) {
         container.innerHTML = `
-        <div style="text-align:center; padding:40px;">
-            <h3>No Workplaces Available</h3>
-            <p>Check back later or add a new workspace.</p>
-        </div>
-    `;
+            <div style="text-align:center; padding:40px;">
+                <h3>No Workplaces Available</h3>
+                <p>Check back later or add a new workspace.</p>
+            </div>
+        `;
         return;
     }
 
@@ -435,12 +499,12 @@ function displayProperties(properties) {
         card.className = "card";
 
         card.innerHTML = `
-            <div class="image-placeholder"></div>
-            <p><strong>${p.workspace}</strong></p>
-            <p>${p.address}</p>
-            <p>$${p.price}/hr</p>
-            <button onclick="goToDetails(${p.id})">Book Now</button>
-        `;
+                <div class="image-placeholder"></div>
+                <p><strong>${p.workspace}</strong></p>
+                <p>${p.address}</p>
+                <p>$${p.price}/hr</p>
+                <button onclick="goToDetails(${p.id})">Book Now</button>
+            `;
 
         card.onclick = () => {
             window.location.href = `workplace-details.html?id=${p.id}`;
@@ -508,7 +572,7 @@ function loadPropertyDetails() {
         return;
     }
 
-    fetch('/api/properties')
+    fetch('/data/properties.json')
         .then(res => res.json())
         .then(properties => {
             const property = properties.find(p => p.id === id);
@@ -555,9 +619,9 @@ function renderPropertyDetails(p) {
                 div.className = "amenity";
 
                 div.innerHTML = `
-                    <span></span>
-                    <p>${item}</p>
-                `;
+                        <span></span>
+                        <p>${item}</p>
+                    `;
 
                 amenitiesContainer.appendChild(div);
             });
@@ -582,23 +646,22 @@ function updatePricing() {
     const priceBox = document.querySelector(".price-box");
 
     priceBox.innerHTML = `
-        <p>$${currentPropertyPrice} × ${hours} hours <span>$${baseCost.toFixed(2)}</span></p>
-        <p>Service fee (3%) <span>$${serviceFee.toFixed(2)}</span></p>
-        <hr>
-        <p><strong>Total</strong> <strong>$${total.toFixed(2)}</strong></p>
-    `;
+            <p>$${currentPropertyPrice} × ${hours} hours <span>$${baseCost.toFixed(2)}</span></p>
+            <p>Service fee (3%) <span>$${serviceFee.toFixed(2)}</span></p>
+            <hr>
+            <p><strong>Total</strong> <strong>$${total.toFixed(2)}</strong></p>
+        `;
 }
 
 async function bookNow() {
     const userId = localStorage.getItem("userId");
 
-    // Get propertyId from URL
     const params = new URLSearchParams(window.location.search);
     const propertyId = parseInt(params.get("id"));
 
     const date = document.getElementById("bookingDate").value;
     const startTime = document.getElementById("startTime").value;
-    const duration = document.getElementById("duration").value;
+    const duration = parseInt(document.getElementById("duration").value);
 
     if (!userId) {
         alert("Please log in first");
@@ -610,31 +673,46 @@ async function bookNow() {
         return;
     }
 
-    const bookingData = {
+    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+    // ===== PREVENT DOUBLE BOOKING =====
+    function timeToMinutes(time) {
+        const [h, m] = time.split(":").map(Number);
+        return h * 60 + m;
+    }
+
+    const conflict = bookings.find(b => {
+        if (Number(b.propertyId) !== propertyId) return false;
+        if (b.date !== date) return false;
+
+        const existingStart = timeToMinutes(b.startTime);
+        const existingEnd = existingStart + (b.duration * 60);
+
+        const newStart = timeToMinutes(startTime);
+        const newEnd = newStart + (duration * 60);
+
+        return newStart < existingEnd && newEnd > existingStart;
+    });
+
+    if (conflict) {
+        alert("This time slot is already booked");
+        return;
+    }
+
+    // ===== SAVE BOOKING =====
+    const newBooking = {
+        id: Date.now(),
         userId: parseInt(userId),
         propertyId,
         date,
         startTime,
-        duration: parseInt(duration)
+        duration
     };
 
-    try {
-        const res = await fetch("http://localhost:3000/book", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(bookingData)
-        });
+    bookings.push(newBooking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
 
-        const result = await res.json();
-        console.log(result);
-
-        alert("Booking successful!");
-    } catch (err) {
-        console.error(err);
-        alert("Booking failed");
-    }
+    alert("Booking successful!");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -648,6 +726,12 @@ document.addEventListener("DOMContentLoaded", () => {
         loadBookings();
     }
 
+    // Load saved payment methods and render them if on the profile page
+    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    renderPaymentMethods();
+    // Load saved personal info if on the profile page
+    loadPersonalInfo();
+
     const durationSelect = document.getElementById("duration");
     if (durationSelect) {
         durationSelect.addEventListener("change", updatePricing);
@@ -657,4 +741,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (bookBtn) {
         bookBtn.addEventListener("click", bookNow);
     }
+
+    const dateInput = document.getElementById("bookingDate");
+    if (dateInput) {
+        dateInput.addEventListener("change", renderCalendarSlots);
+    }
+
+    renderCalendarSlots();
 });
