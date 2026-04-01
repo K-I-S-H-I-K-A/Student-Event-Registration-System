@@ -22,5 +22,37 @@
     "password": "12345",
     "role": "user",
     "id": 3
+  },
+  {
+    "email": "test2@testing.com",
+    "name": "Rick Grimes",
+    "phone": "1111111111",
+    "password": "1234",
+    "role": "user",
+    "id": 4
+  },
+  {
+    "email": "test3@test.com",
+    "name": "Michael Jackson",
+    "phone": "9999999999",
+    "password": "123",
+    "role": "owner",
+    "id": 5
+  },
+  {
+    "email": "test4@gmail.com",
+    "name": "Thor Odinson",
+    "phone": "8888888888",
+    "password": "123",
+    "role": "owner",
+    "id": 6
+  },
+  {
+    "email": "test5@test.com",
+    "name": "Max Verstappen",
+    "phone": "3333333333",
+    "password": "333",
+    "role": "owner",
+    "id": 7
   }
 ]
