@@ -1,5 +1,7 @@
 let allBookings = [];
 let allProperties = [];
+let properties = [];
+let editingPropertyIndex = null;
 
 function login() {
     const email = document.getElementById("email").value;
@@ -156,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPaymentMethods();
     // Load saved personal info if on the profile page
     loadPersonalInfo();
+    // Load saved properties if on the profile page
+    properties = JSON.parse(localStorage.getItem('ownerProperties') || '[]');
+    renderProperties();
 });
 
 // ===== PERSONAL INFORMATION =====
@@ -658,3 +663,106 @@ document.addEventListener("DOMContentLoaded", () => {
         bookBtn.addEventListener("click", bookNow);
     }
 });
+
+// ===== PROPERTIES =====
+
+function addProperty() {
+    const address       = document.getElementById('prop-address')?.value.trim();
+    const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
+    const sqft          = document.getElementById('prop-sqft')?.value.trim();
+    const parking       = document.getElementById('prop-parking')?.checked;
+    const transit       = document.getElementById('prop-transit')?.checked;
+
+    if (!address || !sqft) return;
+
+    properties.push({ address, neighbourhood, sqft, parking, transit });
+    localStorage.setItem('ownerProperties', JSON.stringify(properties));
+
+    // Clear form
+    document.getElementById('prop-address').value = '';
+    document.getElementById('prop-neighbourhood').value = '';
+    document.getElementById('prop-sqft').value = '';
+    document.getElementById('prop-parking').checked = false;
+    document.getElementById('prop-transit').checked = false;
+
+    renderProperties();
+}
+
+function renderProperties() {
+    const tbody   = document.getElementById('properties-tbody');
+    const table   = document.getElementById('properties-table');
+    const noMsg   = document.getElementById('no-properties-msg');
+
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (properties.length === 0) {
+        if (table)  table.style.display  = 'none';
+        if (noMsg)  noMsg.style.display  = 'block';
+        return;
+    }
+
+    if (table)  table.style.display  = 'table';
+    if (noMsg)  noMsg.style.display  = 'none';
+
+    properties.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${p.address}</td>
+            <td>${p.neighbourhood || '—'}</td>
+            <td>${p.sqft}</td>
+            <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${i}); return false;">Edit</a></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openPropertyModal(index) {
+    editingPropertyIndex = index;
+    const p = properties[index];
+
+    document.getElementById('edit-prop-address').value       = p.address;
+    document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
+    document.getElementById('edit-prop-sqft').value          = p.sqft;
+    document.getElementById('edit-prop-parking').checked     = p.parking || false;
+    document.getElementById('edit-prop-transit').checked     = p.transit || false;
+
+    document.getElementById('property-overlay').classList.add('active');
+}
+
+function closePropertyModal() {
+    document.getElementById('property-overlay').classList.remove('active');
+}
+
+function handlePropertyOverlayClick(event) {
+    if (event.target === document.getElementById('property-overlay')) {
+        closePropertyModal();
+    }
+}
+
+function savePropertyEdit() {
+    const address       = document.getElementById('edit-prop-address').value.trim();
+    const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
+    const sqft          = document.getElementById('edit-prop-sqft').value.trim();
+    const parking       = document.getElementById('edit-prop-parking').checked;
+    const transit       = document.getElementById('edit-prop-transit').checked;
+
+    if (!address || !sqft) return;
+
+    properties[editingPropertyIndex] = { address, neighbourhood, sqft, parking, transit };
+    localStorage.setItem('ownerProperties', JSON.stringify(properties));
+    renderProperties();
+    closePropertyModal();
+}
+
+function deleteProperty() {
+    const confirmed = confirm("Are you sure you want to delete it?");
+    if (confirmed) {
+        properties.splice(editingPropertyIndex, 1);
+        localStorage.setItem('ownerProperties', JSON.stringify(properties));
+        renderProperties();
+        closePropertyModal();
+    }
+    // If no, stay in modal
+}
