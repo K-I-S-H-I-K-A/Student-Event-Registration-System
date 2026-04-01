@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,93 +10,66 @@
 
 <body>
 
-<!-- HEADER -->
-<header>
-    <h2>LOGO</h2>
-    <nav>
-        <a href="#">Home</a>
-        <a href="#" class="active">Bookings</a>
-        <a href="#">Profile</a>
-    </nav>
-</header>
+    <!-- HEADER -->
+    <header>
+        <a href="index.html" class="logo-link"><h2>LOGO</h2></a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="profile.html">Profile</a>
+            <button id="auth-btn" onclick="handleAuth()">Sign In</button>
+        </nav>
+    </header>
 
-<div class="my-bookings">
+    <div class="my-bookings">
 
-    <div class="top-bar">
-        <h1>My Bookings</h1>
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <h1>My Bookings</h1>
 
-        <div class="actions">
-            <button class="btn primary">+ New Booking</button>
-            <button class="btn">🔍 Search Bookings</button>
-        </div>
-    </div>
-
-    <!-- SUMMARY CARDS -->
-    <div class="cards">
-
-        <div class="card">
-            <h4>UPCOMING</h4>
-            <h2>3</h2>
-            <p>Next: Mar 18</p>
-        </div>
-
-        <div class="card">
-            <h4>PENDING</h4>
-            <h2>4</h2>
-            <p>Awaiting Confirmation</p>
-        </div>
-
-        <div class="card">
-            <h4>COMPLETED</h4>
-            <h2>5</h2>
-        </div>
-
-        <div class="card">
-            <h4>CALENDAR</h4>
-            <p style="font-size: 30px;">📅</p>
-        </div>
-
-    </div>
-
-    <!-- BOOKINGS -->
-    <div class="booking">
-        <h3>Workspace A</h3>
-
-        <div class="booking-content">
-            <div class="image-placeholder"></div>
-
-            <div class="details">
-                <p class="location">📍 123 Place Street, Cityname, ST, 1A2 B3C</p>
-                <p>
-                    Description: Praeterea, ex culpa non invenies unum aut non accusatis unum.
-                    Et nihil iuvant. Nemo nocere tibi erit, et non inimicos.
-                </p>
+            <div class="actions">
+                <button class="btn primary">+ New Booking</button>
+                <button class="btn">🔍 Search Bookings</button>
             </div>
         </div>
-    </div>
 
-    <div class="booking">
-        <h3>Workspace B</h3>
+        <!-- SUMMARY CARDS -->
+        <div class="cards">
 
-        <div class="booking-content">
-            <div class="image-placeholder"></div>
-
-            <div class="details">
-                <p class="location">📍 456 Place Street, Cityname, ST, 4A5 B6C</p>
-                <p>
-                    Description: Praeterea, ex culpa non invenies unum aut non accusatis unum.
-                    Et nihil iuvant. Nemo nocere tibi erit, et non inimicos.
-                </p>
+            <div class="card" onclick="filterBookings('all')">
+                <h4>ALL</h4>
+                <h2 id="all-count">0</h2>
             </div>
+
+            <div class="card" onclick="filterBookings('upcoming')">
+                <h4>UPCOMING</h4>
+                <h2 id="upcoming-count">0</h2>
+                <p id="next-booking">Next: -</p>
+            </div>
+
+            <div class="card" onclick="filterBookings('pending')">
+                <h4>PENDING</h4>
+                <h2 id="pending-count">0</h2>
+                <p>Awaiting Confirmation</p>
+            </div>
+
+            <div class="card" onclick="filterBookings('completed')">
+                <h4>COMPLETED</h4>
+                <h2 id="completed-count">0</h2>
+            </div>
+
         </div>
+        <!-- BOOKINGS (DYNAMIC) -->
+        <div id="bookings-list"></div>
+
     </div>
 
-</div>
+    <!-- FOOTER -->
+    <footer>
+        <p>Contact | Terms | Privacy | Workspace 2026</p>
+    </footer>
 
-<!-- FOOTER -->
-<footer>
-    <p>Contact | Terms | Privacy | Workspace 2026</p>
-</footer>
+    <script src="/app.js"></script>
 
 </body>
+
 </html>

@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "workspace": "Workspace A",
+    "address": "123 Place Street",
+    "owner": "John Doe",
+    "price": 75,
+    "amenities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
+    "status": "Not Booked"
+  },
+  {
+    "id": 2,
+    "workspace": "Workspace B",
+    "address": "456 Place Street",
+    "owner": "John Doe",
+    "price": 100,
+    "amenities": ["High Speed Wifi", "Printer & Copier", "Parking Space"],
+    "description": "A great workspace for your needs.",
+    "status": "Booked"
+  }
+]

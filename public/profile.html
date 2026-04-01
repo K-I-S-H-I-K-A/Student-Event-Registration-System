@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Profile - Workspace App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <a href="index.html" class="logo-link"><h2>LOGO</h2></a>
+    <nav>
+        <a href="index.html">Back to Home</a>
+        <a href="my_bookings.html">My Bookings</a>
+    </nav>
+</header>
+
+<!-- PROFILE CONTAINER -->
+<div class="profile-container">
+
+    <p class="profile-role">Owner</p>
+
+    <!-- PERSONAL INFORMATION SECTION -->
+    <div class="profile-section">
+        <h3>Personal Information</h3>
+
+        <div class="profile-form">
+
+            <div class="profile-form-row">
+                <input type="text" id="profile-phone" class="profile-input-full personal-info-input" placeholder="Phone Number">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="email" id="profile-email" class="profile-input-full personal-info-input" placeholder="Email Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" id="profile-address" class="profile-input-full personal-info-input" placeholder="Street Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" id="profile-city" class="profile-input-half personal-info-input" placeholder="City">
+                <input type="text" id="profile-zip" class="profile-input-half personal-info-input" placeholder="Zip Code">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" id="profile-province" class="profile-input-half personal-info-input" placeholder="Province">
+                <input type="text" id="profile-country" class="profile-input-half personal-info-input" placeholder="Country">
+            </div>
+
+            <button id="personal-info-btn" class="profile-add-btn" onclick="savePersonalInfo()">Save</button>
+
+            <!-- PAYMENT METHODS SUBSECTION -->
+            <div class="profile-subsection" id="payment-methods-subsection">
+                <h4 class="profile-subsection-title">Payment Methods</h4>
+                <div id="payment-methods-list"></div>
+            </div>
+
+            <button id="payment-add-btn" class="profile-add-btn" onclick="openPaymentModal()">+ Add Payment Method</button>
+
+        </div>
+    </div>
+
+    <!-- ADD NEW PROPERTY SECTION -->
+    <div class="profile-section">
+        <h3>Add New Property</h3>
+
+        <div class="profile-form">
+
+            <div class="profile-form-row">
+                <input type="text" id="prop-address" class="profile-input-full" placeholder="Address">
+            </div>
+
+            <div class="profile-form-row">
+                <input type="text" id="prop-neighbourhood" class="profile-input-half" placeholder="Neighbourhood">
+                <input type="text" id="prop-sqft" class="profile-input-half" placeholder="Sq. Feet">
+            </div>
+
+            <div class="profile-form-row">
+                <label class="profile-checkbox-label">
+                    <input type="checkbox" id="prop-parking"> Parking
+                </label>
+                <label class="profile-checkbox-label">
+                    <input type="checkbox" id="prop-transit"> Public Transport
+                </label>
+            </div>
+
+            <button class="profile-add-btn" onclick="addProperty()">+ Add Property</button>
+
+        </div>
+    </div>
+
+    <!-- YOUR PROPERTIES SECTION -->
+    <div class="profile-section">
+        <h3>Your Properties</h3>
+
+        <p id="no-properties-msg" style="font-size:14px; color:#777;">No properties available.</p>
+
+        <table class="profile-table" id="properties-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Neighbourhood</th>
+                    <th>Sq. Ft</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="properties-tbody"></tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<!-- EDIT PROPERTY MODAL -->
+<div class="payment-overlay" id="property-overlay" onclick="handlePropertyOverlayClick(event)">
+    <div class="payment-modal">
+
+        <div class="payment-modal-header">
+            <h3>Edit Property</h3>
+            <button class="payment-close-btn" onclick="closePropertyModal()">&#x2715;</button>
+        </div>
+
+        <div class="payment-field-row">
+            <input type="text" id="edit-prop-address" class="payment-input-full" placeholder="Address">
+        </div>
+        <div class="payment-field-row">
+            <input type="text" id="edit-prop-neighbourhood" class="payment-input-half" placeholder="Neighbourhood">
+            <input type="text" id="edit-prop-sqft" class="payment-input-half" placeholder="Sq. Feet">
+        </div>
+        <div class="payment-field-row">
+            <label class="profile-checkbox-label">
+                <input type="checkbox" id="edit-prop-parking"> Parking
+            </label>
+            <label class="profile-checkbox-label">
+                <input type="checkbox" id="edit-prop-transit"> Public Transport
+            </label>
+        </div>
+
+        <div class="payment-btn-row">
+            <button class="payment-delete-btn" style="display:block;" onclick="deleteProperty()">Delete</button>
+            <div class="payment-btn-right">
+                <button class="payment-cancel-btn" onclick="closePropertyModal()">Cancel</button>
+                <button class="payment-confirm-btn" onclick="savePropertyEdit()">Save</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- PAYMENT METHOD MODAL -->
+<div class="payment-overlay" id="payment-overlay" onclick="handleOverlayClick(event)">
+    <div class="payment-modal">
+
+        <div class="payment-modal-header">
+            <h3>Add a Payment Method</h3>
+            <button class="payment-close-btn" onclick="closePaymentModal()">&#x2715;</button>
+        </div>
+
+        <div class="payment-method-options">
+            <label class="payment-option">
+                <input type="radio" name="payment-type" value="credit-card" checked onchange="toggleCardFields()"> Credit Card
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="payment-type" value="paypal" onchange="toggleCardFields()"> PayPal
+            </label>
+        </div>
+
+        <div class="payment-card-fields" id="payment-card-fields">
+            <div class="payment-field-row">
+                <input type="text" id="payment-card-number" class="payment-input-full" placeholder="Card Number" maxlength="19">
+            </div>
+            <div class="payment-field-row">
+                <input type="text" id="payment-expiry" class="payment-input-half" placeholder="Expiry Date (MM/YY)" maxlength="5">
+                <input type="text" id="payment-cvc" class="payment-input-half" placeholder="CVC" maxlength="3">
+            </div>
+        </div>
+
+        <div class="payment-paypal-fields" id="payment-paypal-fields">
+            <div class="payment-field-row">
+                <input type="email" id="payment-paypal-email" class="payment-input-full" placeholder="PayPal Email">
+            </div>
+        </div>
+
+        <div class="payment-btn-row">
+            <button id="payment-delete-btn" class="payment-delete-btn" onclick="deletePaymentMethod()">Delete</button>
+            <div class="payment-btn-right">
+                <button class="payment-cancel-btn" onclick="closePaymentModal()">Cancel</button>
+                <button class="payment-confirm-btn" onclick="savePaymentMethod()">Add</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    Contact | Terms | Privacy | 2026 Workspace App
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

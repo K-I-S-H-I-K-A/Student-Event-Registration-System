@@ -12,25 +12,29 @@
 <body>
 
     <header>
-        <h2>LOGO</h2>
+        <a href="index.html" class="logo-link"><h2>LOGO</h2></a>
         <nav>
-            <a href="#">About us</a>
-            <a href="#">Workspaces</a>
-            <a href="profile.htm">My Profile</a>
-            <a href="login.html">
-                <button>Sign In</button>
-            </a>
+            <a href="about_us.html">About us</a>
+            <a href="my_bookings.html">My Bookings</a>
+            <a href="profile.html">My Profile</a>
+            <button id="auth-btn" onclick="handleAuth()">Sign In</button>
         </nav>
     </header>
 
     <section class="hero">
         <h1>Find Your Perfect Workspace Anytime, Anywhere</h1>
-        <input class="search-box" type="text" placeholder="Search Location...">
+        <div class="search-wrapper">
+            <input id="searchInput" class="search-box" type="text" placeholder="Search Location..."
+                oninput="handleSearch()" />
+
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </div>
         <p>Browse coworking spaces, meeting rooms, and private offices for rent in your city</p>
     </section>
 
     <h3 class="section-title">Workspaces</h3>
 
+<<<<<<< HEAD
     <div class="workspace-container">
         <div class="card">
             <div class="image-placeholder"></div>
@@ -67,12 +71,18 @@
             <button>Book Now</button>
             </a>
         </div>
+=======
+    <div class="workspace-container" id="workspace-list">
+        <!-- Dynamic workspace cards will be inserted here -->
+>>>>>>> 2231fccb32b839ad71362eaf3a0c686950b69528
     </div>
 
     <!-- FOOTER -->
     <footer>
         Contact | Terms | Privacy | 2026 Workspace App
     </footer>
+
+    <script src="/app.js"></script>
 
 </body>
 
