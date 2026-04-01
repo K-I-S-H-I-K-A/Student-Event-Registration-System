@@ -175,7 +175,7 @@ const server = http.createServer((req, res) => {
     // ===== GET ALL PROPERTIES =====
     // Returns all available properties
     else if (req.method === 'GET' && req.url === '/data/properties') {
-        const propertiesFile = path.join(__dirname, 'data', 'properties.json');
+        const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
 
         try {
             const data = fs.readFileSync(propertiesFile, 'utf-8');

@@ -3,6 +3,8 @@ let allBookings = [];
 let allProperties = [];
 let properties = [];
 let editingPropertyIndex = null;
+let paymentMethods = [];
+let editingPaymentIndex = null;
 
 // ===== LOGIN FUNCTION =====
 function login() {
@@ -218,6 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPersonalInfo();
     // Load owner properties from server if on the profile page
     loadOwnerProperties();
+    // Load all properties for the home page
+    loadAllProperties();
 });
 
 function renderCalendarSlots() {
@@ -522,4 +526,178 @@ async function deleteProperty() {
         }
     }
     // If no, stay in modal
+}
+
+// ===== PAYMENT METHOD FUNCTIONS =====
+
+function renderPaymentMethods() {
+    const list = document.getElementById('payment-methods-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    paymentMethods.forEach((method, i) => {
+        const div = document.createElement('div');
+        div.className = 'payment-saved-item';
+        div.innerHTML = method.type === 'credit-card'
+            ? `<span>Credit Card •••• •••• •••• ${method.cardNumber.slice(-4)}</span> <a href="#" class="profile-action-link" onclick="openPaymentModal(${i}); return false;">Edit</a>`
+            : `<span>PayPal — ${method.paypalEmail}</span> <a href="#" class="profile-action-link" onclick="openPaymentModal(${i}); return false;">Edit</a>`;
+        list.appendChild(div);
+    });
+
+    // Show/hide the subsection and update button label
+    const subsection = document.getElementById('payment-methods-subsection');
+    const addBtn = document.getElementById('payment-add-btn');
+    if (subsection) subsection.style.display = paymentMethods.length > 0 ? 'block' : 'none';
+    if (addBtn) addBtn.textContent = paymentMethods.length > 0 ? '+ Add More Payment Methods' : '+ Add Payment Method';
+}
+
+function openPaymentModal(index) {
+    const overlay = document.getElementById('payment-overlay');
+    const deleteBtn = document.getElementById('payment-delete-btn');
+    const confirmBtn = overlay.querySelector('.payment-confirm-btn');
+
+    if (index !== undefined) {
+        // Edit existing
+        editingPaymentIndex = index;
+        const method = paymentMethods[index];
+        overlay.querySelector('h3').textContent = 'Edit Payment Method';
+        confirmBtn.textContent = 'Save';
+        deleteBtn.style.display = 'block';
+
+        if (method.type === 'credit-card') {
+            overlay.querySelector('input[value="credit-card"]').checked = true;
+            document.getElementById('payment-card-number').value = method.cardNumber;
+            document.getElementById('payment-expiry').value = method.expiry;
+            document.getElementById('payment-cvc').value = method.cvc;
+        } else {
+            overlay.querySelector('input[value="paypal"]').checked = true;
+            document.getElementById('payment-paypal-email').value = method.paypalEmail;
+        }
+        toggleCardFields();
+    } else {
+        // Add new
+        editingPaymentIndex = null;
+        overlay.querySelector('h3').textContent = 'Add a Payment Method';
+        confirmBtn.textContent = 'Add';
+        deleteBtn.style.display = 'none';
+        overlay.querySelector('input[value="credit-card"]').checked = true;
+        document.getElementById('payment-card-number').value = '';
+        document.getElementById('payment-expiry').value = '';
+        document.getElementById('payment-cvc').value = '';
+        document.getElementById('payment-paypal-email').value = '';
+        toggleCardFields();
+    }
+
+    overlay.classList.add('active');
+}
+
+function closePaymentModal() {
+    document.getElementById('payment-overlay').classList.remove('active');
+}
+
+function handleOverlayClick(event) {
+    if (event.target === document.getElementById('payment-overlay')) {
+        closePaymentModal();
+    }
+}
+
+function toggleCardFields() {
+    const type = document.querySelector('input[name="payment-type"]:checked').value;
+    document.getElementById('payment-card-fields').style.display = type === 'credit-card' ? 'block' : 'none';
+    document.getElementById('payment-paypal-fields').style.display = type === 'paypal' ? 'block' : 'none';
+}
+
+function savePaymentMethod() {
+    const type = document.querySelector('input[name="payment-type"]:checked').value;
+    let method;
+
+    if (type === 'credit-card') {
+        const cardNumber = document.getElementById('payment-card-number').value.trim();
+        const expiry = document.getElementById('payment-expiry').value.trim();
+        const cvc = document.getElementById('payment-cvc').value.trim();
+        if (!cardNumber || !expiry || !cvc) {
+            alert('Please fill in all card fields.');
+            return;
+        }
+        method = { type: 'credit-card', cardNumber, expiry, cvc };
+    } else {
+        const paypalEmail = document.getElementById('payment-paypal-email').value.trim();
+        if (!paypalEmail) {
+            alert('Please enter your PayPal email.');
+            return;
+        }
+        method = { type: 'paypal', paypalEmail };
+    }
+
+    if (editingPaymentIndex !== null) {
+        paymentMethods[editingPaymentIndex] = method;
+    } else {
+        paymentMethods.push(method);
+    }
+
+    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    renderPaymentMethods();
+    closePaymentModal();
+}
+
+function deletePaymentMethod() {
+    if (editingPaymentIndex === null) return;
+    const confirmed = confirm('Remove this payment method?');
+    if (!confirmed) return;
+
+    paymentMethods.splice(editingPaymentIndex, 1);
+    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    renderPaymentMethods();
+    closePaymentModal();
+}
+
+// ===== HOME PAGE FUNCTIONS =====
+
+async function loadAllProperties() {
+    const container = document.getElementById('workspace-list');
+    if (!container) return;
+
+    try {
+        const res = await fetch('/data/properties');
+        allProperties = await res.json();
+        renderWorkspaceCards(allProperties);
+    } catch (err) {
+        console.error('Error loading properties:', err);
+    }
+}
+
+function renderWorkspaceCards(list) {
+    const container = document.getElementById('workspace-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (list.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#777;">No workspaces available.</p>';
+        return;
+    }
+
+    list.forEach(p => {
+        const card = document.createElement('a');
+        card.className = 'card';
+        card.href = `Workplace-details.html?id=${p.id}`;
+        card.innerHTML = `
+            <div class="image-placeholder"></div>
+            <p><strong>${p.workspace || p.address}</strong></p>
+            <p>${p.address}</p>
+            <p>$${p.price}/hr</p>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function handleSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const filtered = allProperties.filter(p =>
+        (p.address || '').toLowerCase().includes(query) ||
+        (p.workspace || '').toLowerCase().includes(query) ||
+        (p.neighbourhood || '').toLowerCase().includes(query)
+    );
+    renderWorkspaceCards(filtered);
 }
