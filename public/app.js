@@ -206,13 +206,20 @@ function cancelBooking(bookingId) {
 
     alert("Booking cancelled");
 
-    // refresh UI
-    loadBookings();
+    loadBookings(); // refresh UI
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthButton();
+    // Load saved payment methods and render them if on the profile page
+    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    renderPaymentMethods();
+    // Load saved personal info if on the profile page
+    loadPersonalInfo();
+    // Load owner properties from server if on the profile page
+    loadOwnerProperties();
+});
 
-
-// ===== RENDER CALENDAR SLOTS =====
 function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
@@ -315,7 +322,204 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadPersonalInfo();
 
-    // load owner properties
-    properties = JSON.parse(localStorage.getItem('ownerProperties') || '[]');
-    renderProperties();
+    const durationSelect = document.getElementById("duration");
+    if (durationSelect) {
+        durationSelect.addEventListener("change", updatePricing);
+    }
+
+    const bookBtn = document.getElementById("bookNowBtn");
+    if (bookBtn) {
+        bookBtn.addEventListener("click", bookNow);
+    }
+
+    const dateInput = document.getElementById("bookingDate");
+    if (dateInput) {
+        dateInput.addEventListener("change", renderCalendarSlots);
+    }
+
+    renderCalendarSlots();
 });
+
+// ===== PROPERTIES =====
+
+async function loadOwnerProperties() {
+    const tbody = document.getElementById('properties-tbody');
+    if (!tbody) return;
+
+    const userId = parseInt(localStorage.getItem('userId'));
+
+    try {
+        const res = await fetch('/data/properties.json');
+        const all = await res.json();
+        properties = all.filter(p => p.ownerId === userId);
+        renderProperties();
+    } catch (err) {
+        console.error('Error loading owner properties:', err);
+    }
+}
+
+async function addProperty() {
+    const address = document.getElementById('prop-address')?.value.trim();
+    const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
+    const sqft = document.getElementById('prop-sqft')?.value.trim();
+    const price = parseFloat(document.getElementById('prop-price')?.value) || 0;
+    const parking = document.getElementById('prop-parking')?.checked;
+    const transit = document.getElementById('prop-transit')?.checked;
+
+    if (!address || !sqft) return;
+
+    const amenities = [];
+    if (parking) amenities.push('Parking Space');
+    if (transit) amenities.push('Public Transport');
+
+    const newProperty = {
+        workspace: address,
+        address,
+        neighbourhood,
+        sqft,
+        parking,
+        transit,
+        amenities,
+        ownerId: parseInt(localStorage.getItem('userId')) || null,
+        owner: '',
+        price,
+        description: '',
+        status: 'Not Booked'
+    };
+
+    try {
+        const res = await fetch('/properties', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newProperty)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            properties.push(data.property);
+
+            // Clear form
+            document.getElementById('prop-address').value = '';
+            document.getElementById('prop-neighbourhood').value = '';
+            document.getElementById('prop-sqft').value = '';
+            document.getElementById('prop-price').value = '';
+            document.getElementById('prop-parking').checked = false;
+            document.getElementById('prop-transit').checked = false;
+
+            renderProperties();
+        }
+    } catch (err) {
+        console.error('Error adding property:', err);
+    }
+}
+
+function renderProperties() {
+    const tbody = document.getElementById('properties-tbody');
+    const table = document.getElementById('properties-table');
+    const noMsg = document.getElementById('no-properties-msg');
+
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (properties.length === 0) {
+        if (table) table.style.display = 'none';
+        if (noMsg) noMsg.style.display = 'block';
+        return;
+    }
+
+    if (table) table.style.display = 'table';
+    if (noMsg) noMsg.style.display = 'none';
+
+    properties.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${p.address}</td>
+            <td>${p.neighbourhood || '—'}</td>
+            <td>${p.sqft}</td>
+            <td>${p.price ? '$' + p.price + '/hr' : '—'}</td>
+            <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${i}); return false;">Edit</a></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function openPropertyModal(index) {
+    editingPropertyIndex = index;
+    const p = properties[index];
+
+    document.getElementById('edit-prop-address').value = p.address;
+    document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
+    document.getElementById('edit-prop-sqft').value = p.sqft;
+    document.getElementById('edit-prop-price').value = p.price != null ? p.price : '';
+    document.getElementById('edit-prop-parking').checked = p.parking || false;
+    document.getElementById('edit-prop-transit').checked = p.transit || false;
+
+    document.getElementById('property-overlay').classList.add('active');
+}
+
+function closePropertyModal() {
+    document.getElementById('property-overlay').classList.remove('active');
+}
+
+function handlePropertyOverlayClick(event) {
+    if (event.target === document.getElementById('property-overlay')) {
+        closePropertyModal();
+    }
+}
+
+async function savePropertyEdit() {
+    const address = document.getElementById('edit-prop-address').value.trim();
+    const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
+    const sqft = document.getElementById('edit-prop-sqft').value.trim();
+    const price = parseFloat(document.getElementById('edit-prop-price').value) || 0;
+    const parking = document.getElementById('edit-prop-parking').checked;
+    const transit = document.getElementById('edit-prop-transit').checked;
+
+    if (!address || !sqft) return;
+
+    const amenities = [];
+    if (parking) amenities.push('Parking Space');
+    if (transit) amenities.push('Public Transport');
+
+    const p = properties[editingPropertyIndex];
+    const updated = { address, neighbourhood, sqft, price, parking, transit, amenities, workspace: address };
+
+    try {
+        const res = await fetch(`/properties/${p.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            properties[editingPropertyIndex] = { ...p, ...updated };
+            renderProperties();
+            closePropertyModal();
+        }
+    } catch (err) {
+        console.error('Error saving property edit:', err);
+    }
+}
+
+async function deleteProperty() {
+    const confirmed = confirm("Are you sure you want to delete it?");
+    if (confirmed) {
+        const p = properties[editingPropertyIndex];
+
+        try {
+            const res = await fetch(`/properties/${p.id}`, { method: 'DELETE' });
+            const data = await res.json();
+
+            if (data.success) {
+                properties.splice(editingPropertyIndex, 1);
+                renderProperties();
+                closePropertyModal();
+            }
+        } catch (err) {
+            console.error('Error deleting property:', err);
+        }
+    }
+    // If no, stay in modal
+}
