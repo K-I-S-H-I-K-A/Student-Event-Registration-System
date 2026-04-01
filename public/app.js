@@ -197,9 +197,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPaymentMethods();
     // Load saved personal info if on the profile page
     loadPersonalInfo();
-    // Load saved properties if on the profile page
-    properties = JSON.parse(localStorage.getItem('ownerProperties') || '[]');
-    renderProperties();
+    // Load owner properties from server if on the profile page
+    loadOwnerProperties();
 });
 
 function renderCalendarSlots() {
@@ -833,26 +832,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ===== PROPERTIES =====
 
-function addProperty() {
+async function loadOwnerProperties() {
+    const tbody = document.getElementById('properties-tbody');
+    if (!tbody) return;
+
+    const userId = parseInt(localStorage.getItem('userId'));
+
+    try {
+        const res = await fetch('/data/properties.json');
+        const all = await res.json();
+        properties = all.filter(p => p.ownerId === userId);
+        renderProperties();
+    } catch (err) {
+        console.error('Error loading owner properties:', err);
+    }
+}
+
+async function addProperty() {
     const address = document.getElementById('prop-address')?.value.trim();
     const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
     const sqft = document.getElementById('prop-sqft')?.value.trim();
+    const price = parseFloat(document.getElementById('prop-price')?.value) || 0;
     const parking = document.getElementById('prop-parking')?.checked;
     const transit = document.getElementById('prop-transit')?.checked;
 
     if (!address || !sqft) return;
 
-    properties.push({ address, neighbourhood, sqft, parking, transit });
-    localStorage.setItem('ownerProperties', JSON.stringify(properties));
+    const amenities = [];
+    if (parking) amenities.push('Parking Space');
+    if (transit) amenities.push('Public Transport');
 
-    // Clear form
-    document.getElementById('prop-address').value = '';
-    document.getElementById('prop-neighbourhood').value = '';
-    document.getElementById('prop-sqft').value = '';
-    document.getElementById('prop-parking').checked = false;
-    document.getElementById('prop-transit').checked = false;
+    const newProperty = {
+        workspace: address,
+        address,
+        neighbourhood,
+        sqft,
+        parking,
+        transit,
+        amenities,
+        ownerId: parseInt(localStorage.getItem('userId')) || null,
+        owner: '',
+        price,
+        description: '',
+        status: 'Not Booked'
+    };
 
-    renderProperties();
+    try {
+        const res = await fetch('/properties', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newProperty)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            properties.push(data.property);
+
+            // Clear form
+            document.getElementById('prop-address').value = '';
+            document.getElementById('prop-neighbourhood').value = '';
+            document.getElementById('prop-sqft').value = '';
+            document.getElementById('prop-price').value = '';
+            document.getElementById('prop-parking').checked = false;
+            document.getElementById('prop-transit').checked = false;
+
+            renderProperties();
+        }
+    } catch (err) {
+        console.error('Error adding property:', err);
+    }
 }
 
 function renderProperties() {
@@ -879,6 +927,7 @@ function renderProperties() {
             <td>${p.address}</td>
             <td>${p.neighbourhood || '—'}</td>
             <td>${p.sqft}</td>
+            <td>${p.price ? '$' + p.price + '/hr' : '—'}</td>
             <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${i}); return false;">Edit</a></td>
         `;
         tbody.appendChild(tr);
@@ -892,6 +941,7 @@ function openPropertyModal(index) {
     document.getElementById('edit-prop-address').value = p.address;
     document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
     document.getElementById('edit-prop-sqft').value = p.sqft;
+    document.getElementById('edit-prop-price').value = p.price != null ? p.price : '';
     document.getElementById('edit-prop-parking').checked = p.parking || false;
     document.getElementById('edit-prop-transit').checked = p.transit || false;
 
@@ -908,28 +958,58 @@ function handlePropertyOverlayClick(event) {
     }
 }
 
-function savePropertyEdit() {
+async function savePropertyEdit() {
     const address = document.getElementById('edit-prop-address').value.trim();
     const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
     const sqft = document.getElementById('edit-prop-sqft').value.trim();
+    const price = parseFloat(document.getElementById('edit-prop-price').value) || 0;
     const parking = document.getElementById('edit-prop-parking').checked;
     const transit = document.getElementById('edit-prop-transit').checked;
 
     if (!address || !sqft) return;
 
-    properties[editingPropertyIndex] = { address, neighbourhood, sqft, parking, transit };
-    localStorage.setItem('ownerProperties', JSON.stringify(properties));
-    renderProperties();
-    closePropertyModal();
+    const amenities = [];
+    if (parking) amenities.push('Parking Space');
+    if (transit) amenities.push('Public Transport');
+
+    const p = properties[editingPropertyIndex];
+    const updated = { address, neighbourhood, sqft, price, parking, transit, amenities, workspace: address };
+
+    try {
+        const res = await fetch(`/properties/${p.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updated)
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            properties[editingPropertyIndex] = { ...p, ...updated };
+            renderProperties();
+            closePropertyModal();
+        }
+    } catch (err) {
+        console.error('Error saving property edit:', err);
+    }
 }
 
-function deleteProperty() {
+async function deleteProperty() {
     const confirmed = confirm("Are you sure you want to delete it?");
     if (confirmed) {
-        properties.splice(editingPropertyIndex, 1);
-        localStorage.setItem('ownerProperties', JSON.stringify(properties));
-        renderProperties();
-        closePropertyModal();
+        const p = properties[editingPropertyIndex];
+
+        try {
+            const res = await fetch(`/properties/${p.id}`, { method: 'DELETE' });
+            const data = await res.json();
+
+            if (data.success) {
+                properties.splice(editingPropertyIndex, 1);
+                renderProperties();
+                closePropertyModal();
+            }
+        } catch (err) {
+            console.error('Error deleting property:', err);
+        }
     }
     // If no, stay in modal
 }

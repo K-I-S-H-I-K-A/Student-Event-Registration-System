@@ -230,6 +230,83 @@ const server = http.createServer((req, res) => {
         });
     }
 
+    // ===== ADD PROPERTY =====
+    else if (req.method === 'POST' && req.url === '/properties') {
+        let body = '';
+
+        req.on('data', chunk => body += chunk);
+
+        req.on('end', () => {
+            try {
+                const newProperty = JSON.parse(body);
+                const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
+                let properties = JSON.parse(fs.readFileSync(propertiesFile, 'utf-8'));
+
+                let nextId = properties.length > 0 ? Math.max(...properties.map(p => p.id || 0)) + 1 : 1;
+                newProperty.id = nextId;
+
+                properties.push(newProperty);
+                fs.writeFileSync(propertiesFile, JSON.stringify(properties, null, 2));
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, property: newProperty }));
+            } catch (error) {
+                res.writeHead(500);
+                res.end("Server Error");
+            }
+        });
+    }
+
+    // ===== UPDATE PROPERTY =====
+    else if (req.method === 'PUT' && req.url.startsWith('/properties/')) {
+        const id = parseInt(req.url.split('/')[2]);
+        let body = '';
+
+        req.on('data', chunk => body += chunk);
+
+        req.on('end', () => {
+            try {
+                const updatedData = JSON.parse(body);
+                const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
+                let properties = JSON.parse(fs.readFileSync(propertiesFile, 'utf-8'));
+
+                const index = properties.findIndex(p => p.id === id);
+                if (index === -1) {
+                    res.writeHead(404);
+                    return res.end("Not Found");
+                }
+
+                properties[index] = { ...properties[index], ...updatedData };
+                fs.writeFileSync(propertiesFile, JSON.stringify(properties, null, 2));
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+            } catch (error) {
+                res.writeHead(500);
+                res.end("Server Error");
+            }
+        });
+    }
+
+    // ===== DELETE PROPERTY =====
+    else if (req.method === 'DELETE' && req.url.startsWith('/properties/')) {
+        const id = parseInt(req.url.split('/')[2]);
+
+        try {
+            const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
+            let properties = JSON.parse(fs.readFileSync(propertiesFile, 'utf-8'));
+
+            properties = properties.filter(p => p.id !== id);
+            fs.writeFileSync(propertiesFile, JSON.stringify(properties, null, 2));
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
+    }
+
     // ===== SERVE FRONTEND FILES =====
     else {
         const url = new URL(req.url, `http://${req.headers.host}`);
