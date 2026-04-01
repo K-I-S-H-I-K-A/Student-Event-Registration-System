@@ -76,22 +76,28 @@ nav a.active {
     text-align: center;
     margin: 30px 0;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .workspace-container {
     display: flex;
     justify-content: center;
     gap: 20px;
+    overflow-x: auto;
+    grid-template-columns: repeat(4, 200px);
     flex-wrap: wrap;
 }
 
 .card {
+    flex: 0 0 auto;
+    height: 220px;
     width: 180px;
     background: white;
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
     border-radius: 6px;
+    text-decoration: none;
 }
 
 .card:hover {
@@ -125,6 +131,7 @@ nav a.active {
 
 /* FOOTER */
 footer {
+    position: relative;
     text-align: center;
     padding: 10px;
     background: #e9ecef;
@@ -614,4 +621,98 @@ footer {
 
 .profile-action-link:hover {
     text-decoration: underline;
+}
+/* ================= BOOKING CONFIRMATION PAGE ================= */
+
+.confirmation-container {
+    width: 900px;
+    margin: 30px auto;
+    background: #ffffff;
+    border: 1px solid #cfd4da;
+}
+
+.confirmation-header {
+    background: #e6eaee;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-bottom: 1px solid #cfd4da;
+}
+
+.confirmation-success {
+    margin: 25px;
+     padding: 25px;
+    background: #f4f7fb;
+    border: 1px solid #d3dbe5;
+    text-align: left;
+}
+
+.confirmation-success h2 {
+    margin-top: 0;
+}
+
+.confirmation-details {
+    margin: 25px;
+    padding: 20px;
+    border: 1px solid #d3dbe5;
+}
+
+.confirmation-details h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.confirmation-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.confirmation-image {
+    width: 160px;
+    height: 120px;
+    background: #d9dde2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+}
+
+.confirmation-info {
+    font-size: 15px;
+}
+
+.confirmation-info p {
+    margin: 6px 0;
+}
+
+footer {
+    position: relative;
+}
+@media (max-width: 768px) {
+
+    .confirmation-container {
+        width: 90%;
+        margin: 20px auto;
+    }
+
+    .confirmation-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .confirmation-image {
+        width: 100%;
+        height: 150px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
