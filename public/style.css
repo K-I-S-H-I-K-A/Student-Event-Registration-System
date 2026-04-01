@@ -664,8 +664,7 @@ footer {
 .profile-action-link:hover {
     text-decoration: underline;
 }
-<<<<<<< HEAD
-/* ================= BOOKING CONFIRMATION PAGE ================= */
+
 
 .confirmation-container {
     width: 900px;
@@ -758,9 +757,6 @@ footer {
         flex-direction: column;
         gap: 10px;
     }
-=======
-
-/* ================= ABOUT US PAGE ================= */
 
 .about-hero {
     text-align: center;
@@ -1014,5 +1010,5 @@ footer {
     cursor: pointer;
     padding: 0;
     font-size: 13px;
->>>>>>> 2231fccb32b839ad71362eaf3a0c686950b69528
+}
 }
