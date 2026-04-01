@@ -98,7 +98,7 @@ const server = http.createServer((req, res) => {
     }
 
     // ===== GET BOOKINGS FOR USER =====
-    else if (req.method === 'GET' && req.url.startsWith('/api/bookings')) {
+    else if (req.method === 'GET' && req.url.startsWith('/data/bookings')) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const userId = parseInt(url.searchParams.get('userId'));
 
@@ -140,7 +140,7 @@ const server = http.createServer((req, res) => {
 }
 
     // ===== GET ALL PROPERTIES =====
-    else if (req.method === 'GET' && req.url === '/api/properties') {
+    else if (req.method === 'GET' && req.url === '/data/properties') {
         const propertiesFile = path.join(__dirname, 'data', 'properties.json');
 
         try {

@@ -177,8 +177,18 @@ function displayBookings(bookings) {
         container.appendChild(div);
     });
 }
-<<<<<<< HEAD
-=======
+
+function cancelBooking(bookingId) {
+    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+
+    const updatedBookings = bookings.filter(b => b.id !== bookingId);
+
+    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
+
+    alert("Booking cancelled");
+
+    loadBookings(); // refresh UI
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     updateAuthButton();
@@ -191,17 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
     properties = JSON.parse(localStorage.getItem('ownerProperties') || '[]');
     renderProperties();
 });
-function cancelBooking(bookingId) {
-    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-
-    const updatedBookings = bookings.filter(b => b.id !== bookingId);
-
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-
-    alert("Booking cancelled");
-
-    loadBookings(); // refresh UI
-}
 
 function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
@@ -727,7 +726,70 @@ async function bookNow() {
     bookings.push(newBooking);
     localStorage.setItem("bookings", JSON.stringify(bookings));
 
-    alert("Booking successful!");
+    // SAVE CONFIRMATION DATA
+    localStorage.setItem("lastBooking", JSON.stringify(newBooking));
+
+    // REDIRECT TO CONFIRMATION PAGE
+    window.location.href = "booking-confirmation.html";
+}
+
+async function loadBookingConfirmation() {
+    const booking = JSON.parse(localStorage.getItem("lastBooking"));
+
+    if (!booking) {
+        console.error("No booking found");
+        return;
+    }
+
+    const container = document.getElementById("confirmation-info");
+    if (!container) return;
+
+    try {
+        const res = await fetch('/data/properties.json');
+        const properties = await res.json();
+
+        const property = properties.find(p => p.id === booking.propertyId);
+
+        const workspace = property?.workspace || "Unknown";
+        const owner = property?.owner || "N/A";
+        const location = property?.address || "N/A";
+
+        const start = booking.startTime;
+        const end = calculateEndTime(start, booking.duration);
+
+        container.innerHTML = `
+            <p><strong>Workspace:</strong> ${workspace}</p>
+            <p><strong>Property:</strong> ${owner}</p>
+            <p><strong>Location:</strong> ${location}</p>
+            <p><strong>Date:</strong> ${booking.date}</p>
+            <p><strong>Time:</strong> ${formatTime(start)} – ${formatTime(end)}</p>
+        `;
+
+        localStorage.removeItem("lastBooking");
+
+    } catch (err) {
+        console.error("Error loading confirmation:", err);
+    }
+}
+
+function calculateEndTime(startTime, duration) {
+    const [h, m] = startTime.split(":").map(Number);
+    let totalMinutes = h * 60 + m + (duration * 60);
+
+    const endH = Math.floor(totalMinutes / 60);
+    const endM = totalMinutes % 60;
+
+    return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+}
+
+function formatTime(time) {
+    let [h, m] = time.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+
+    h = h % 12;
+    h = h ? h : 12;
+
+    return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -739,6 +801,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (document.getElementById("bookings-list")) {
         loadBookings();
+    }
+
+    if (document.getElementById("confirmation-info")) {
+        loadBookingConfirmation();
     }
 
     // Load saved payment methods and render them if on the profile page
@@ -768,11 +834,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // ===== PROPERTIES =====
 
 function addProperty() {
-    const address       = document.getElementById('prop-address')?.value.trim();
+    const address = document.getElementById('prop-address')?.value.trim();
     const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
-    const sqft          = document.getElementById('prop-sqft')?.value.trim();
-    const parking       = document.getElementById('prop-parking')?.checked;
-    const transit       = document.getElementById('prop-transit')?.checked;
+    const sqft = document.getElementById('prop-sqft')?.value.trim();
+    const parking = document.getElementById('prop-parking')?.checked;
+    const transit = document.getElementById('prop-transit')?.checked;
 
     if (!address || !sqft) return;
 
@@ -790,22 +856,22 @@ function addProperty() {
 }
 
 function renderProperties() {
-    const tbody   = document.getElementById('properties-tbody');
-    const table   = document.getElementById('properties-table');
-    const noMsg   = document.getElementById('no-properties-msg');
+    const tbody = document.getElementById('properties-tbody');
+    const table = document.getElementById('properties-table');
+    const noMsg = document.getElementById('no-properties-msg');
 
     if (!tbody) return;
 
     tbody.innerHTML = '';
 
     if (properties.length === 0) {
-        if (table)  table.style.display  = 'none';
-        if (noMsg)  noMsg.style.display  = 'block';
+        if (table) table.style.display = 'none';
+        if (noMsg) noMsg.style.display = 'block';
         return;
     }
 
-    if (table)  table.style.display  = 'table';
-    if (noMsg)  noMsg.style.display  = 'none';
+    if (table) table.style.display = 'table';
+    if (noMsg) noMsg.style.display = 'none';
 
     properties.forEach((p, i) => {
         const tr = document.createElement('tr');
@@ -823,11 +889,11 @@ function openPropertyModal(index) {
     editingPropertyIndex = index;
     const p = properties[index];
 
-    document.getElementById('edit-prop-address').value       = p.address;
+    document.getElementById('edit-prop-address').value = p.address;
     document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
-    document.getElementById('edit-prop-sqft').value          = p.sqft;
-    document.getElementById('edit-prop-parking').checked     = p.parking || false;
-    document.getElementById('edit-prop-transit').checked     = p.transit || false;
+    document.getElementById('edit-prop-sqft').value = p.sqft;
+    document.getElementById('edit-prop-parking').checked = p.parking || false;
+    document.getElementById('edit-prop-transit').checked = p.transit || false;
 
     document.getElementById('property-overlay').classList.add('active');
 }
@@ -843,11 +909,11 @@ function handlePropertyOverlayClick(event) {
 }
 
 function savePropertyEdit() {
-    const address       = document.getElementById('edit-prop-address').value.trim();
+    const address = document.getElementById('edit-prop-address').value.trim();
     const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
-    const sqft          = document.getElementById('edit-prop-sqft').value.trim();
-    const parking       = document.getElementById('edit-prop-parking').checked;
-    const transit       = document.getElementById('edit-prop-transit').checked;
+    const sqft = document.getElementById('edit-prop-sqft').value.trim();
+    const parking = document.getElementById('edit-prop-parking').checked;
+    const transit = document.getElementById('edit-prop-transit').checked;
 
     if (!address || !sqft) return;
 
@@ -867,4 +933,3 @@ function deleteProperty() {
     }
     // If no, stay in modal
 }
->>>>>>> 2231fccb32b839ad71362eaf3a0c686950b69528

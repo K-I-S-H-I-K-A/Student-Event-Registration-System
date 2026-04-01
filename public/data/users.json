@@ -14,5 +14,13 @@
     "phone": "1234567890",
     "password": "1234",
     "role": "user"
+  },
+  {
+    "email": "testing1@test.com",
+    "name": "Dummy dum",
+    "phone": "1234567890",
+    "password": "12345",
+    "role": "user",
+    "id": 3
   }
 ]
