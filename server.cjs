@@ -132,8 +132,8 @@ const server = http.createServer((req, res) => {
         const userId = parseInt(url.searchParams.get('userId'));
 
         // Define file paths
-        const bookingsFile = path.join(__dirname, 'data', 'bookings.json');
-        const propertiesFile = path.join(__dirname, 'data', 'properties.json');
+        const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
+        const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
 
         try {
             // Read bookings data
@@ -202,7 +202,7 @@ const server = http.createServer((req, res) => {
                 // Parse booking data
                 const bookingData = JSON.parse(body);
 
-                const bookingsFile = path.join(__dirname, 'data', 'bookings.json');
+                const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
 
                 let bookings = [];
 

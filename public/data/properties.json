@@ -1,33 +1,5 @@
 [
   {
-    "id": 1,
-    "workspace": "Workspace A",
-    "address": "123 Place Street",
-    "owner": "John Doe",
-    "price": 75,
-    "amenities": [
-      "High Speed Wifi",
-      "Printer & Copier",
-      "Parking Space"
-    ],
-    "description": "A great workspace for your needs.",
-    "status": "Not Booked"
-  },
-  {
-    "id": 2,
-    "workspace": "Workspace B",
-    "address": "456 Place Street",
-    "owner": "John Doe",
-    "price": 100,
-    "amenities": [
-      "High Speed Wifi",
-      "Printer & Copier",
-      "Parking Space"
-    ],
-    "description": "A great workspace for your needs.",
-    "status": "Booked"
-  },
-  {
     "workspace": "123 Place st SW",
     "address": "123 Place st SW",
     "neighbourhood": "Discoveryland",
@@ -61,5 +33,20 @@
     "description": "",
     "status": "Not Booked",
     "id": 4
+  },
+  {
+    "workspace": "742 Evergreen Ridge Dr",
+    "address": "742 Evergreen Ridge Dr",
+    "neighbourhood": "Maplewood Heights",
+    "sqft": "1850",
+    "parking": false,
+    "transit": false,
+    "amenities": [],
+    "ownerId": 1,
+    "owner": "",
+    "price": 85,
+    "description": "",
+    "status": "Not Booked",
+    "id": 5
   }
 ]

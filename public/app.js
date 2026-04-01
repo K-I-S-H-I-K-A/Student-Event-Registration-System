@@ -107,57 +107,90 @@ function handleAuth() {
 // ===== LOAD BOOKINGS FOR LOGGED USER =====
 async function loadBookings() {
     try {
-        const userId = parseInt(localStorage.getItem("userId"));
+        const userId = localStorage.getItem("userId");
 
         if (!userId) {
             console.log("No user logged in");
             return;
         }
 
-        // get bookings from localStorage
-        const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+        const res = await fetch(`/data/bookings?userId=${userId}`);
+        const bookings = await res.json();
 
-        console.log("Stored bookings:", bookings);
-        console.log("Current userId:", userId);
+        const propertyRes = await fetch('/data/properties');
+        const properties = await propertyRes.json();
 
-        if (bookings.length === 0) {
-            displayBookings([]);
-            return;
-        }
+        allBookings = bookings;
+        allProperties = properties;
 
-        // fetch property data
-        const res = await fetch('/data/properties.json');
-
-        if (!res.ok) {
-            throw new Error("Failed to load properties.json");
-        }
-
-        const properties = await res.json();
-
-        // filter bookings for current user and enrich with property data
-        const userBookings = bookings
-            .filter(b => b.userId === userId)
-            .map(b => {
-                const property = properties.find(p => p.id === b.propertyId);
-
-                return {
-                    ...b,
-                    workspace: property?.workspace || "Unknown",
-                    address: property?.address || "",
-                    status: "upcoming"
-                };
-            });
-
-        console.log("User bookings:", userBookings);
-
-        allBookings = userBookings;
-
-        displayBookings(userBookings);
-        updateSummary(userBookings);
+        displayBookings(bookings);
+        updateSummary(bookings);
 
     } catch (err) {
         console.error("loadBookings error:", err);
     }
+}
+
+function updateSummary(bookings) {
+    if (!bookings) return;
+
+    // ALL
+    document.getElementById("all-count").innerText = bookings.length;
+
+    // UPCOMING
+    const upcoming = bookings.filter(b => b.status === "upcoming");
+    document.getElementById("upcoming-count").innerText = upcoming.length;
+
+    // AMENITIES / NO AMENITIES (based on property)
+    const withAmenities = bookings.filter(b => {
+        const property = allProperties.find(p => p.id === b.propertyId);
+        return property && property.amenities && property.amenities.length > 0;
+    });
+
+    const withoutAmenities = bookings.filter(b => {
+        const property = allProperties.find(p => p.id === b.propertyId);
+        return !property || !property.amenities || property.amenities.length === 0;
+    });
+
+    document.getElementById("amenities-count").innerText = withAmenities.length;
+    document.getElementById("no-amenities-count").innerText = withoutAmenities.length;
+
+    // NEXT BOOKING (optional but keep)
+    const nextBookingEl = document.getElementById("next-booking");
+
+    if (upcoming.length > 0) {
+        nextBookingEl.innerText = "Next: " + upcoming[0].date;
+    } else {
+        nextBookingEl.innerText = "Next: -";
+    }
+}
+
+function filterBookings(type) {
+    let filtered = [...allBookings];
+
+    if (type === "all") {
+        filtered = allBookings;
+    }
+
+    else if (type === "upcoming") {
+        filtered = filtered.filter(b => b.status === "upcoming");
+    }
+
+    else if (type === "amenities") {
+        filtered = filtered.filter(b => {
+            const property = allProperties.find(p => p.id === b.propertyId);
+            return property && property.amenities && property.amenities.length > 0;
+        });
+    }
+
+    else if (type === "no-amenities") {
+        filtered = filtered.filter(b => {
+            const property = allProperties.find(p => p.id === b.propertyId);
+            return !property || property.amenities.length === 0;
+        });
+    }
+
+    displayBookings(filtered);
 }
 
 // ===== DISPLAY BOOKINGS IN UI =====
@@ -198,33 +231,27 @@ function displayBookings(bookings) {
 }
 
 // ===== CANCEL BOOKING =====
-function cancelBooking(bookingId) {
-    let bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
+async function cancelBooking(bookingId) {
+    try {
+        const res = await fetch(`/bookings/${bookingId}`, {
+            method: 'DELETE'
+        });
 
-    // remove booking by ID
-    const updatedBookings = bookings.filter(b => b.id !== bookingId);
+        const data = await res.json();
 
-    localStorage.setItem("bookings", JSON.stringify(updatedBookings));
-
-    alert("Booking cancelled");
-
-    loadBookings(); // refresh UI
+        if (data.success) {
+            alert("Booking cancelled");
+            loadBookings(); // refresh from server
+        } else {
+            alert("Failed to cancel booking");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    updateAuthButton();
-    // Load saved payment methods and render them if on the profile page
-    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-    renderPaymentMethods();
-    // Load saved personal info if on the profile page
-    loadPersonalInfo();
-    // Load owner properties from server if on the profile page
-    loadOwnerProperties();
-    // Load all properties for the home page
-    loadAllProperties();
-});
-
-function renderCalendarSlots() {
+async function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
 
@@ -233,28 +260,33 @@ function renderCalendarSlots() {
     const date = dateInput.value;
     if (!date) return;
 
-    const bookings = JSON.parse(localStorage.getItem("bookings") || "[]");
     const propertyId = parseInt(new URLSearchParams(window.location.search).get("id"));
 
-    // filter bookings for selected property and date
-    const propertyBookings = bookings.filter(
-        b => b.propertyId === propertyId && b.date === date
-    );
+    try {
+        const res = await fetch('/data/bookings');
+        const bookings = await res.json();
 
-    container.innerHTML = "<h4>Booked Time Slots:</h4>";
+        const propertyBookings = bookings.filter(
+            b => b.propertyId === propertyId && b.date === date
+        );
 
-    if (propertyBookings.length === 0) {
-        container.innerHTML += "<p>No bookings for this date.</p>";
-        return;
+        container.innerHTML = "<h4>Booked Time Slots:</h4>";
+
+        if (propertyBookings.length === 0) {
+            container.innerHTML += "<p>No bookings for this date.</p>";
+            return;
+        }
+
+        propertyBookings.forEach(b => {
+            const div = document.createElement("div");
+            div.className = "slot";
+            div.textContent = `${b.startTime} for ${b.duration}h`;
+            container.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error(err);
     }
-
-    // display booked time slots
-    propertyBookings.forEach(b => {
-        const div = document.createElement("div");
-        div.className = "slot";
-        div.textContent = `${b.startTime} for ${b.duration}h`;
-        container.appendChild(div);
-    });
 }
 
 // ===== PERSONAL INFO FUNCTIONS =====
@@ -316,34 +348,6 @@ function loadPersonalInfo() {
     setPersonalInfoMode('view');
 }
 
-// ===== DOM CONTENT LOADED INITIALIZATION =====
-document.addEventListener("DOMContentLoaded", () => {
-    updateAuthButton();
-
-    // load profile-related data if present
-    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-    renderPaymentMethods();
-
-    loadPersonalInfo();
-
-    const durationSelect = document.getElementById("duration");
-    if (durationSelect) {
-        durationSelect.addEventListener("change", updatePricing);
-    }
-
-    const bookBtn = document.getElementById("bookNowBtn");
-    if (bookBtn) {
-        bookBtn.addEventListener("click", bookNow);
-    }
-
-    const dateInput = document.getElementById("bookingDate");
-    if (dateInput) {
-        dateInput.addEventListener("change", renderCalendarSlots);
-    }
-
-    renderCalendarSlots();
-});
-
 // ===== PROPERTIES =====
 
 async function loadOwnerProperties() {
@@ -353,7 +357,7 @@ async function loadOwnerProperties() {
     const userId = parseInt(localStorage.getItem('userId'));
 
     try {
-        const res = await fetch('/data/properties.json');
+        const res = await fetch('/data/properties');
         const all = await res.json();
         properties = all.filter(p => p.ownerId === userId);
         renderProperties();
@@ -674,7 +678,7 @@ function renderWorkspaceCards(list) {
     container.innerHTML = '';
 
     if (list.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">No workspaces available.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#777;">No workspaces available under this filter.</p>';
         return;
     }
 
@@ -701,3 +705,240 @@ function handleSearch() {
     );
     renderWorkspaceCards(filtered);
 }
+
+async function loadHomepageProperties() {
+    const container = document.getElementById("workspace-list");
+    if (!container) return;
+
+    try {
+        const res = await fetch('/data/properties');
+        const properties = await res.json();
+
+        container.innerHTML = "";
+
+        if (properties.length === 0) {
+            container.innerHTML = "<p>No workspaces available.</p>";
+            return;
+        }
+
+        properties.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "card";
+
+            div.innerHTML = `
+                <div class="image-placeholder"></div>
+
+                <p><strong>${p.workspace}</strong></p>
+                <p>${p.address}</p>
+                <p>${p.sqft} sqft</p>
+                <p>${p.price ? '$' + p.price + '/hr' : 'Price not available'}</p>
+
+                <button onclick="window.location.href='Workplace-details.html?id=${p.id}'">
+                    Book Now
+                </button>
+            `;
+
+            container.appendChild(div);
+        });
+    } catch (err) {
+        console.error('Error loading homepage properties:', err);
+    }
+}
+
+let selectedProperty = null;
+
+async function loadPropertyDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+
+    if (!id) return;
+
+    const res = await fetch('/data/properties');
+    const properties = await res.json();
+
+    selectedProperty = properties.find(p => p.id === id);
+
+    if (!selectedProperty) return;
+
+    // Populate basic UI
+    document.querySelector(".details-left h2").textContent = selectedProperty.workspace;
+    document.querySelector(".location").textContent = selectedProperty.address;
+    document.getElementById("propertyDescription").textContent = selectedProperty.description || "";
+
+    // Render price initially
+    updatePricing();
+}
+
+function updatePricing() {
+    const durationSelect = document.getElementById("duration");
+    const priceBox = document.querySelector(".price-box");
+
+    if (!durationSelect || !priceBox || !selectedProperty) return;
+
+    const duration = parseInt(durationSelect.value);
+
+    if (!duration) {
+        priceBox.innerHTML = `
+            <p>$0 x 0 hours <span>$0</span></p>
+            <p>Service fee <span>$0</span></p>
+            <hr>
+            <p><strong>Total</strong> <strong>$0</strong></p>
+        `;
+        return;
+    }
+
+    const hourlyRate = selectedProperty.price;
+    const subtotal = hourlyRate * duration;
+    const serviceFee = subtotal * 0.03;
+    const total = subtotal + serviceFee;
+
+    priceBox.innerHTML = `
+        <p>$${hourlyRate} x ${duration} hours <span>$${subtotal.toFixed(2)}</span></p>
+        <p>Service fee (3%) <span>$${serviceFee.toFixed(2)}</span></p>
+        <hr>
+        <p><strong>Total</strong> <strong>$${total.toFixed(2)}</strong></p>
+    `;
+}
+
+async function bookNow() {
+    const userId = parseInt(localStorage.getItem("userId"));
+
+    if (!userId) {
+        alert("Please log in first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const duration = parseInt(document.getElementById("duration")?.value);
+    const date = document.getElementById("bookingDate")?.value;
+    const startTime = document.getElementById("startTime")?.value;
+
+    if (!duration || !date || !startTime) {
+        alert("Please select date, time, and duration");
+        return;
+    }
+
+    if (!selectedProperty) {
+        alert("Property not loaded");
+        return;
+    }
+
+    // Pricing
+    const hourlyRate = selectedProperty.price;
+    const subtotal = hourlyRate * duration;
+    const serviceFee = subtotal * 0.03;
+    const total = subtotal + serviceFee;
+
+    const booking = {
+        userId,
+        propertyId: selectedProperty.id,
+        date,
+        startTime,
+        duration,
+        hourlyRate,
+        subtotal,
+        serviceFee,
+        total
+    };
+
+    try {
+        const res = await fetch('/book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(booking)
+        });
+
+        const data = await res.json();
+
+
+        if (data.success) {
+            // store locally for confirmation page
+            localStorage.setItem("lastBooking", JSON.stringify(data.booking));
+
+            // redirect
+            window.location.href = `booking-confirmation.html?bookingId=${data.booking.id}`;
+        } else {
+            alert(data.message || "Booking failed");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+}
+
+async function loadBookingConfirmation() {
+    const saved = JSON.parse(localStorage.getItem("lastBooking"));
+
+    if (!saved) {
+        console.error("No booking found in localStorage");
+        return;
+    }
+
+    try {
+        const propRes = await fetch('/data/properties');
+        const properties = await propRes.json();
+
+        const property = properties.find(p => p.id === saved.propertyId);
+
+        const container = document.getElementById("confirmation-info");
+
+        if (!container) return;
+
+        container.innerHTML = `
+            <p><strong>Workspace:</strong> ${property?.workspace || 'N/A'}</p>
+            <p><strong>Address:</strong> ${property?.address || 'N/A'}</p>
+            <p><strong>Date:</strong> ${saved.date}</p>
+            <p><strong>Time:</strong> ${saved.startTime}</p>
+            <p><strong>Duration:</strong> ${saved.duration} hrs</p>
+            <p><strong>Subtotal:</strong> $${saved.subtotal.toFixed(2)}</p>
+            <p><strong>Service Fee:</strong> $${saved.serviceFee.toFixed(2)}</p>
+            <p><strong>Total:</strong> <strong>$${saved.total.toFixed(2)}</strong></p>
+        `;
+    } catch (err) {
+        console.error("Error loading confirmation:", err);
+    }
+}
+
+// ===== DOM CONTENT LOADED INITIALIZATION =====
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthButton();
+
+    loadPersonalInfo();
+
+    // Load owner properties from server if on the profile page
+    loadOwnerProperties();
+
+    // Load all properties for the home page
+    loadAllProperties();
+
+    // Load properties for the home page (if applicable)
+    loadHomepageProperties();
+
+    loadPropertyDetails();
+
+    loadBookingConfirmation();
+
+    loadBookings();
+
+    renderCalendarSlots();
+
+    // Load saved payment methods and render them if on the profile page
+    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    renderPaymentMethods();
+
+    const durationSelect = document.getElementById("duration");
+    if (durationSelect) {
+        durationSelect.addEventListener("change", updatePricing);
+    }
+
+    const bookBtn = document.getElementById("bookNowBtn");
+    if (bookBtn) {
+        bookBtn.addEventListener("click", bookNow);
+    }
+
+    const dateInput = document.getElementById("bookingDate");
+    if (dateInput) {
+        dateInput.addEventListener("change", renderCalendarSlots);
+    }
+});
