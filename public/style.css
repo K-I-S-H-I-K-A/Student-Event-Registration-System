@@ -7,7 +7,9 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #f5f6f8;
-    padding-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* LOGO LINK */
@@ -168,15 +170,13 @@ nav a.active {
 
 /* FOOTER */
 footer {
-    position: relative;
     text-align: center;
     padding: 10px;
     background: #e9ecef;
     font-size: 12px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
     width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
 }
 
 /* ================= AUTH PAGES (LOGIN + REGISTER) ================= */
@@ -560,6 +560,8 @@ footer {
     max-width: 700px;
     margin: 30px auto;
     padding: 0 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .profile-role {
@@ -727,9 +729,6 @@ footer {
     margin: 6px 0;
 }
 
-footer {
-    position: relative;
-}
 @media (max-width: 768px) {
 
     .confirmation-container {
@@ -757,6 +756,8 @@ footer {
         flex-direction: column;
         gap: 10px;
     }
+
+}
 
 .about-hero {
     text-align: center;
@@ -1010,5 +1011,4 @@ footer {
     cursor: pointer;
     padding: 0;
     font-size: 13px;
-}
 }
