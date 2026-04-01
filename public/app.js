@@ -210,6 +210,7 @@ function displayBookings(bookings) {
     bookings.forEach(b => {
         const div = document.createElement("div");
         div.className = "booking";
+        div.id = `booking-${b.id}`;
 
         div.innerHTML = `
                 <div class="booking-content">
@@ -232,6 +233,9 @@ function displayBookings(bookings) {
 
 // ===== CANCEL BOOKING =====
 async function cancelBooking(bookingId) {
+    const confirmed = confirm("Are you sure you want to cancel this booking?");
+    if (!confirmed) return;
+
     try {
         const res = await fetch(`/bookings/${bookingId}`, {
             method: 'DELETE'
@@ -240,8 +244,13 @@ async function cancelBooking(bookingId) {
         const data = await res.json();
 
         if (data.success) {
-            alert("Booking cancelled");
-            loadBookings(); // refresh from server
+            // Remove the booking card from the page
+            const card = document.getElementById(`booking-${bookingId}`);
+            if (card) card.remove();
+
+            // Remove from in-memory array and update summary counts live
+            allBookings = allBookings.filter(b => b.id !== bookingId);
+            updateSummary(allBookings);
         } else {
             alert("Failed to cancel booking");
         }

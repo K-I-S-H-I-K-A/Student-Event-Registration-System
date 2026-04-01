@@ -331,6 +331,25 @@ const server = http.createServer((req, res) => {
         });
     }
 
+    // ===== DELETE BOOKING =====
+    else if (req.method === 'DELETE' && req.url.startsWith('/bookings/')) {
+        const id = parseInt(req.url.split('/')[2]);
+
+        try {
+            const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
+            let bookings = JSON.parse(fs.readFileSync(bookingsFile, 'utf-8'));
+
+            bookings = bookings.filter(b => b.id !== id);
+            fs.writeFileSync(bookingsFile, JSON.stringify(bookings, null, 2));
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
+    }
+
     // ===== DELETE PROPERTY =====
     else if (req.method === 'DELETE' && req.url.startsWith('/properties/')) {
         const id = parseInt(req.url.split('/')[2]);

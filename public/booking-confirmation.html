@@ -31,6 +31,7 @@
             <h2>✔ Booking Confirmed!</h2>
             <p>Your workspace has been successfully booked.</p>
             <p>A confirmation email has been sent to you.</p>
+            <p id="redirect-msg">Redirecting to My Bookings in <span id="countdown">5</span>s...</p>
         </div>
 
         <div class="confirmation-details">
@@ -55,5 +56,18 @@
 </body>
 
 <script src="/app.js"></script>
+<script>
+    // Redirect to My Bookings after 5 seconds
+    let seconds = 5;
+    const countdownEl = document.getElementById("countdown");
+    const interval = setInterval(() => {
+        seconds--;
+        countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(interval);
+            window.location.href = "my_bookings.html";
+        }
+    }, 1000);
+</script>
 
 </html>
