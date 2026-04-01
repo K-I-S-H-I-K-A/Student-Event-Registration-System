@@ -15,13 +15,14 @@
     <nav>
         <a href="index.html">Back to Home</a>
         <a href="my_bookings.html">My Bookings</a>
+        <button id="auth-btn" onclick="handleAuth()">Sign In</button>
     </nav>
 </header>
 
 <!-- PROFILE CONTAINER -->
 <div class="profile-container">
 
-    <p class="profile-role">Owner</p>
+    <p class="profile-role" id="profile-role-label">Owner</p>
 
     <!-- PERSONAL INFORMATION SECTION -->
     <div class="profile-section">
@@ -69,7 +70,7 @@
     </div>
 
     <!-- ADD NEW PROPERTY SECTION -->
-    <div class="profile-section">
+    <div class="profile-section" id="add-property-section">
         <h3>Add New Property</h3>
 
         <div class="profile-form">
@@ -102,7 +103,7 @@
     </div>
 
     <!-- YOUR PROPERTIES SECTION -->
-    <div class="profile-section">
+    <div class="profile-section" id="your-properties-section">
         <h3>Your Properties</h3>
 
         <p id="no-properties-msg" style="font-size:14px; color:#777;">No properties available.</p>

@@ -5,7 +5,7 @@
     "password": "123",
     "name": "John Doe",
     "phone": "1234567890",
-    "role": "user"
+    "role": "coworker"
   },
   {
     "id": 2,
@@ -13,14 +13,14 @@
     "name": "Machine Vision",
     "phone": "1234567890",
     "password": "1234",
-    "role": "user"
+    "role": "coworker"
   },
   {
     "email": "testing1@test.com",
     "name": "Dummy dum",
     "phone": "1234567890",
     "password": "12345",
-    "role": "user",
+    "role": "coworker",
     "id": 3
   },
   {
@@ -28,7 +28,7 @@
     "name": "Rick Grimes",
     "phone": "1111111111",
     "password": "1234",
-    "role": "user",
+    "role": "coworker",
     "id": 4
   },
   {
@@ -54,5 +54,13 @@
     "password": "333",
     "role": "owner",
     "id": 7
+  },
+  {
+    "email": "test6@test.com",
+    "name": "Magomed Coruja Ankalaev",
+    "phone": "5555555555",
+    "password": "123",
+    "role": "coworker",
+    "id": 8
   }
 ]

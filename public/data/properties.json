@@ -79,5 +79,23 @@
     "description": "",
     "status": "Not Booked",
     "id": 5
+  },
+  {
+    "workspace": "123 McLaren St NW",
+    "address": "123 McLaren St NW",
+    "neighbourhood": "McLaren",
+    "sqft": "1700",
+    "parking": true,
+    "transit": true,
+    "amenities": [
+      "Parking Space",
+      "Public Transport"
+    ],
+    "ownerId": 7,
+    "owner": "",
+    "price": 70,
+    "description": "",
+    "status": "Not Booked",
+    "id": 6
   }
 ]

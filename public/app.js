@@ -27,9 +27,10 @@ function login() {
             if (data.success) {
                 alert("Login successful!");
 
-                // store logged-in user ID and name in localStorage
+                // store logged-in user ID, name and role in localStorage
                 localStorage.setItem("userId", data.id);
                 if (data.name) localStorage.setItem("userName", data.name);
+                if (data.role) localStorage.setItem("userRole", data.role);
 
                 // redirect to home page
                 window.location.href = "index.html";
@@ -115,11 +116,16 @@ function handleAuth() {
     if (userId && userId !== "0") {
         // logout: remove user from storage
         localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
 
         updateAuthButton();
 
-        // refresh page after logout
-        window.location.reload();
+        // redirect to home page if logging out from profile, otherwise reload
+        if (window.location.pathname.includes("profile.html")) {
+            window.location.href = "index.html";
+        } else {
+            window.location.reload();
+        }
     } else {
         // redirect to login page if not logged in
         window.location.href = "login.html";
@@ -249,7 +255,28 @@ document.addEventListener("DOMContentLoaded", () => {
     loadOwnerProperties();
     // Load all properties for the home page
     loadAllProperties();
+    // Apply role-based visibility on the profile page
+    applyProfileRole();
 });
+
+// ===== PROFILE ROLE DISPLAY =====
+function applyProfileRole() {
+    const roleLabel = document.getElementById("profile-role-label");
+    if (!roleLabel) return; // not on profile page
+
+    const role = localStorage.getItem("userRole") || "coworker";
+
+    // Update the role label
+    roleLabel.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+    // Hide owner-only sections for coworkers
+    if (role !== "owner") {
+        const addSection = document.getElementById("add-property-section");
+        const yourSection = document.getElementById("your-properties-section");
+        if (addSection) addSection.style.display = "none";
+        if (yourSection) yourSection.style.display = "none";
+    }
+}
 
 function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
