@@ -5,7 +5,7 @@ const path = require('path');
 const PORT = 3000;
 
 // Path to users.json
-const usersFile = path.join(__dirname, 'data', 'users.json');
+const usersFile = path.join(__dirname, 'public', 'data', 'users.json');
 
 const server = http.createServer((req, res) => {
 
