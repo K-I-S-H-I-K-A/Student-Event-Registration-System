@@ -928,7 +928,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadBookingConfirmation();
 
-    loadBookings();
+    const bookingsList = document.getElementById("bookings-list"); 
+    if (bookingsList) { 
+        loadBookings(); 
+    }
 
     renderCalendarSlots();
 
