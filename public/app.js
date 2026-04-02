@@ -1,38 +1,41 @@
 // ===== GLOBAL STATE VARIABLES =====
-let allBookings = [];
-let allProperties = [];
-let properties = [];
-let editingPropertyIndex = null;
-let paymentMethods = [];
-let editingPaymentIndex = null;
+// These arrays store application-wide data used across multiple functions
+let allBookings = [];        // all bookings loaded from backend
+let allProperties = [];      // all properties loaded from backend
+let properties = [];         // properties owned by the logged-in user
+let editingPropertyIndex = null; // index of property currently being edited
+let paymentMethods = [];     // saved payment methods for the user
+let editingPaymentIndex = null; // index of payment method being edited
 
 // ===== LOGIN FUNCTION =====
+// Handles user login by sending credentials to the backend
 function login() {
     const email = document.getElementById("email").value; // get email input
     const password = document.getElementById("password").value; // get password input
 
+    // Validate required fields
     if (!email || !password) {
         alert("Please fill in all required fields.");
         return;
     }
 
-    // send login request to backend
+    // Send login request to backend API
     fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }) // send credentials as JSON
     })
-        .then(res => res.json()) // parse response
+        .then(res => res.json()) // parse JSON response
         .then(data => {
             if (data.success) {
                 alert("Login successful!");
 
-                // store logged-in user ID, name and role in localStorage
+                // Store user session info in localStorage
                 localStorage.setItem("userId", data.id);
                 if (data.name) localStorage.setItem("userName", data.name);
                 if (data.role) localStorage.setItem("userRole", data.role);
 
-                // redirect to home page
+                // Redirect to homepage
                 window.location.href = "index.html";
             } else {
                 alert("Invalid email or password");
@@ -45,8 +48,9 @@ function login() {
 }
 
 // ===== REGISTER FUNCTION =====
+// Handles new user registration
 function registerUser() {
-    // collect user input into an object
+    // Collect user input into an object
     const user = {
         email: document.getElementById("email").value,
         name: document.getElementById("name").value,
@@ -55,12 +59,13 @@ function registerUser() {
         role: document.getElementById("role").value
     };
 
+    // Validate required fields
     if (!user.email || !user.name || !user.phone || !user.password) {
         alert("Please fill in all required fields.");
         return;
     }
 
-    // send registration request
+    // Send registration request to backend
     fetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,7 +76,7 @@ function registerUser() {
             if (data.success) {
                 alert("Account created!");
 
-                // redirect to login page after successful registration
+                // Redirect to login page after successful registration
                 window.location.href = "login.html";
             } else {
                 alert(data.message);
@@ -83,9 +88,11 @@ function registerUser() {
         });
 }
 
-// ===== PROFILE GUARD =====
+// ===== PROFILE ACCESS GUARD =====
+// Redirects user to profile if logged in, otherwise forces login
 function goToProfile() {
     const userId = localStorage.getItem("userId");
+
     if (userId && userId !== "0") {
         window.location.href = "profile.html";
     } else {
@@ -94,14 +101,14 @@ function goToProfile() {
     }
 }
 
-// ===== UPDATE AUTH BUTTON UI =====
+// ===== AUTH BUTTON UI UPDATE =====
+// Updates the login/logout button text depending on auth state
 function updateAuthButton() {
-    const authBtn = document.getElementById("auth-btn"); // auth button element
-    const userId = localStorage.getItem("userId"); // check login state
+    const authBtn = document.getElementById("auth-btn");
+    const userId = localStorage.getItem("userId");
 
     if (!authBtn) return;
 
-    // if user is logged in, show logout, otherwise sign in
     if (userId && userId !== "0") {
         authBtn.textContent = "Logout";
     } else {
@@ -109,30 +116,32 @@ function updateAuthButton() {
     }
 }
 
-// ===== HANDLE LOGIN/LOGOUT BUTTON =====
+// ===== LOGIN / LOGOUT HANDLER =====
+// Handles clicking the auth button (login or logout)
 function handleAuth() {
     const userId = localStorage.getItem("userId");
 
     if (userId && userId !== "0") {
-        // logout: remove user from storage
+        // Logout: clear stored session data
         localStorage.removeItem("userId");
         localStorage.removeItem("userRole");
 
         updateAuthButton();
 
-        // redirect to home page if logging out from profile, otherwise reload
+        // Redirect or reload depending on current page
         if (window.location.pathname.includes("profile.html")) {
             window.location.href = "index.html";
         } else {
             window.location.reload();
         }
     } else {
-        // redirect to login page if not logged in
+        // Not logged in → go to login page
         window.location.href = "login.html";
     }
 }
 
-// ===== LOAD BOOKINGS FOR LOGGED USER =====
+// ===== LOAD BOOKINGS =====
+// Fetch bookings for the logged-in user and display them
 async function loadBookings() {
     try {
         const userId = localStorage.getItem("userId");
@@ -142,38 +151,43 @@ async function loadBookings() {
             return;
         }
 
+        // Fetch bookings and properties from backend
         const res = await fetch(`/data/bookings?userId=${userId}`);
         const bookings = await res.json();
 
         const propertyRes = await fetch('/data/properties');
         const properties = await propertyRes.json();
 
+        // Store globally for filtering/summary use
         allBookings = bookings;
         allProperties = properties;
 
+        // Sort bookings by date
         const sortedBookings = [...bookings].sort((a, b) => {
             return new Date(a.date) - new Date(b.date);
         });
 
-        displayBookings(sortedBookings);
-        updateSummary(bookings);
+        displayBookings(sortedBookings); // render UI
+        updateSummary(bookings);         // update stats
 
     } catch (err) {
         console.error("loadBookings error:", err);
     }
 }
 
+// ===== UPDATE SUMMARY STATS =====
+// Updates booking summary counters (total, upcoming, amenities, etc.)
 function updateSummary(bookings) {
     if (!bookings) return;
 
-    // ALL
+    // Total bookings
     document.getElementById("all-count").innerText = bookings.length;
 
-    // UPCOMING
+    // Upcoming bookings
     const upcoming = bookings.filter(b => b.status === "upcoming");
     document.getElementById("upcoming-count").innerText = upcoming.length;
 
-    // AMENITIES / NO AMENITIES (based on property)
+    // Filter bookings with and without amenities
     const withAmenities = bookings.filter(b => {
         const property = allProperties.find(p => p.id === b.propertyId);
         return property && property.amenities && property.amenities.length > 0;
@@ -187,7 +201,7 @@ function updateSummary(bookings) {
     document.getElementById("amenities-count").innerText = withAmenities.length;
     document.getElementById("no-amenities-count").innerText = withoutAmenities.length;
 
-    // NEXT BOOKING (optional but keep)
+    // Display next upcoming booking
     const nextBookingEl = document.getElementById("next-booking");
 
     if (upcoming.length > 0) {
@@ -197,39 +211,8 @@ function updateSummary(bookings) {
     }
 }
 
-function filterBookings(type) {
-    let filtered = [...allBookings];
-
-    if (type === "all") {
-        filtered = allBookings;
-    }
-
-    else if (type === "upcoming") {
-        filtered = filtered.filter(b => b.status === "upcoming");
-    }
-
-    else if (type === "amenities") {
-        filtered = filtered.filter(b => {
-            const property = allProperties.find(p => p.id === b.propertyId);
-            return property && property.amenities && property.amenities.length > 0;
-        });
-    }
-
-    else if (type === "no-amenities") {
-        filtered = filtered.filter(b => {
-            const property = allProperties.find(p => p.id === b.propertyId);
-            return !property || property.amenities.length === 0;
-        });
-    }
-
-    const sorted = [...filtered].sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
-    });
-
-    displayBookings(sorted);
-}
-
-// ===== DISPLAY BOOKINGS IN UI =====
+// ===== DISPLAY BOOKINGS =====
+// Renders booking cards into the UI
 function displayBookings(bookings) {
     const container = document.getElementById("bookings-list");
 
@@ -242,32 +225,33 @@ function displayBookings(bookings) {
         return;
     }
 
-    // create UI cards for each booking
+    // Create a card for each booking
     bookings.forEach(b => {
         const div = document.createElement("div");
         div.className = "booking";
         div.id = `booking-${b.id}`;
 
         div.innerHTML = `
-                <div class="booking-content">
-                    <div class="image-placeholder"></div>
+            <div class="booking-content">
+                <div class="image-placeholder"></div>
 
-                    <div class="details">
-                        <h3>${b.workspace}</h3>
-                        <p class="location">${b.address}</p>
-                        <p>${b.date} at ${b.startTime}</p>
-                        <p>Status: ${b.status}</p>
+                <div class="details">
+                    <h3>${b.workspace}</h3>
+                    <p class="location">${b.address}</p>
+                    <p>${b.date} at ${b.startTime}</p>
+                    <p>Status: ${b.status}</p>
 
-                        <button onclick="cancelBooking(${b.id})">Cancel Booking</button>
-                    </div>
+                    <button onclick="cancelBooking(${b.id})">Cancel Booking</button>
                 </div>
-            `;
+            </div>
+        `;
 
         container.appendChild(div);
     });
 }
 
 // ===== CANCEL BOOKING =====
+// Sends delete request and updates UI
 async function cancelBooking(bookingId) {
     const confirmed = confirm("Are you sure you want to cancel this booking?");
     if (!confirmed) return;
@@ -280,11 +264,11 @@ async function cancelBooking(bookingId) {
         const data = await res.json();
 
         if (data.success) {
-            // Remove the booking card from the page
+            // Remove from UI
             const card = document.getElementById(`booking-${bookingId}`);
             if (card) card.remove();
 
-            // Remove from in-memory array and update summary counts live
+            // Update local state and summary
             allBookings = allBookings.filter(b => b.id !== bookingId);
             updateSummary(allBookings);
         } else {
@@ -297,16 +281,16 @@ async function cancelBooking(bookingId) {
 }
 
 // ===== PROFILE ROLE DISPLAY =====
+// Adjust UI based on user role (owner vs coworker)
 function applyProfileRole() {
     const roleLabel = document.getElementById("profile-role-label");
-    if (!roleLabel) return; // not on profile page
+    if (!roleLabel) return;
 
     const role = localStorage.getItem("userRole") || "coworker";
 
-    // Update the role label
     roleLabel.textContent = role.charAt(0).toUpperCase() + role.slice(1);
 
-    // Hide owner-only sections for coworkers
+    // Hide owner-only sections for non-owners
     if (role !== "owner") {
         const addSection = document.getElementById("add-property-section");
         const yourSection = document.getElementById("your-properties-section");
@@ -315,6 +299,8 @@ function applyProfileRole() {
     }
 }
 
+// ===== LOAD PROPERTY DETAILS CALENDAR SLOTS =====
+// Displays booked time slots for a selected date
 async function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
@@ -330,6 +316,7 @@ async function renderCalendarSlots() {
         const res = await fetch('/data/bookings');
         const bookings = await res.json();
 
+        // Filter bookings for selected property and date
         const propertyBookings = bookings.filter(
             b => b.propertyId === propertyId && b.date === date
         );
@@ -341,6 +328,7 @@ async function renderCalendarSlots() {
             return;
         }
 
+        // Display each booked slot
         propertyBookings.forEach(b => {
             const div = document.createElement("div");
             div.className = "slot";
