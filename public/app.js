@@ -1,26 +1,28 @@
 // ===== GLOBAL STATE VARIABLES =====
-let allBookings = [];
-let allProperties = [];
-let properties = [];
-let editingPropertyIndex = null;
-let paymentMethods = [];
-let editingPaymentIndex = null;
+// These arrays store data loaded from the server and used across the app
+let allBookings = [];        // All bookings for the logged-in user
+let allProperties = [];      // All properties from the database
+let properties = [];         // Properties owned by the logged-in user
+let editingPropertyIndex = null; // Tracks which property is being edited
+let paymentMethods = [];     // Saved payment methods (localStorage)
+let editingPaymentIndex = null;  // Tracks which payment method is being edited
 
 // ===== LOGIN FUNCTION =====
 function login() {
     const email = document.getElementById("email").value; // get email input
     const password = document.getElementById("password").value; // get password input
 
+    // Basic validation
     if (!email || !password) {
         alert("Please fill in all required fields.");
         return;
     }
 
-    // send login request to backend
+    // Send login request to backend
     fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }) // send credentials as JSON
+        body: JSON.stringify({ email, password }) // send credentials
     })
         .then(res => res.json()) // parse response
         .then(data => {
@@ -32,7 +34,7 @@ function login() {
                 if (data.name) localStorage.setItem("userName", data.name);
                 if (data.role) localStorage.setItem("userRole", data.role);
 
-                // redirect to home page
+                // Redirect to homepage
                 window.location.href = "index.html";
             } else {
                 alert("Invalid email or password");
@@ -46,7 +48,7 @@ function login() {
 
 // ===== REGISTER FUNCTION =====
 function registerUser() {
-    // collect user input into an object
+    // Collect user input into an object
     const user = {
         email: document.getElementById("email").value,
         name: document.getElementById("name").value,
@@ -55,12 +57,13 @@ function registerUser() {
         role: document.getElementById("role").value
     };
 
+    // Validate required fields
     if (!user.email || !user.name || !user.phone || !user.password) {
         alert("Please fill in all required fields.");
         return;
     }
 
-    // send registration request
+    // Send registration request to backend
     fetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,8 +87,10 @@ function registerUser() {
 }
 
 // ===== PROFILE GUARD =====
+// Redirects user to profile only if logged in
 function goToProfile() {
     const userId = localStorage.getItem("userId");
+
     if (userId && userId !== "0") {
         window.location.href = "profile.html";
     } else {
@@ -95,6 +100,7 @@ function goToProfile() {
 }
 
 // ===== UPDATE AUTH BUTTON UI =====
+// Dynamically updates the navbar button based on login state
 function updateAuthButton() {
     const authBtn = document.getElementById("auth-btn"); // auth button element
     const userId = localStorage.getItem("userId"); // check login state
@@ -110,6 +116,7 @@ function updateAuthButton() {
 }
 
 // ===== HANDLE LOGIN/LOGOUT BUTTON =====
+// Toggles between login and logout behavior
 function handleAuth() {
     const userId = localStorage.getItem("userId");
 
@@ -127,7 +134,7 @@ function handleAuth() {
             window.location.reload();
         }
     } else {
-        // redirect to login page if not logged in
+        // Not logged in → go to login page
         window.location.href = "login.html";
     }
 }
@@ -142,15 +149,18 @@ async function loadBookings() {
             return;
         }
 
+        // Fetch bookings for user
         const res = await fetch(`/data/bookings?userId=${userId}`);
         const bookings = await res.json();
 
+        // Fetch all properties (needed for summary calculations)
         const propertyRes = await fetch('/data/properties');
         const properties = await propertyRes.json();
 
         allBookings = bookings;
         allProperties = properties;
 
+        // Sort bookings by date
         const sortedBookings = [...bookings].sort((a, b) => {
             return new Date(a.date) - new Date(b.date);
         });
@@ -163,6 +173,8 @@ async function loadBookings() {
     }
 }
 
+// ===== UPDATE SUMMARY COUNTS =====
+// Updates dashboard statistics for bookings
 function updateSummary(bookings) {
     if (!bookings) return;
 
@@ -187,7 +199,7 @@ function updateSummary(bookings) {
     document.getElementById("amenities-count").innerText = withAmenities.length;
     document.getElementById("no-amenities-count").innerText = withoutAmenities.length;
 
-    // NEXT BOOKING (optional but keep)
+    // Display next upcoming booking
     const nextBookingEl = document.getElementById("next-booking");
 
     if (upcoming.length > 0) {
@@ -197,24 +209,23 @@ function updateSummary(bookings) {
     }
 }
 
+// ===== FILTER BOOKINGS =====
+// Filters bookings based on selected category
 function filterBookings(type) {
     let filtered = [...allBookings];
 
     if (type === "all") {
         filtered = allBookings;
     }
-
     else if (type === "upcoming") {
         filtered = filtered.filter(b => b.status === "upcoming");
     }
-
     else if (type === "amenities") {
         filtered = filtered.filter(b => {
             const property = allProperties.find(p => p.id === b.propertyId);
             return property && property.amenities && property.amenities.length > 0;
         });
     }
-
     else if (type === "no-amenities") {
         filtered = filtered.filter(b => {
             const property = allProperties.find(p => p.id === b.propertyId);
@@ -222,6 +233,7 @@ function filterBookings(type) {
         });
     }
 
+    // Sort filtered results by date
     const sorted = [...filtered].sort((a, b) => {
         return new Date(a.date) - new Date(b.date);
     });
@@ -230,6 +242,7 @@ function filterBookings(type) {
 }
 
 // ===== DISPLAY BOOKINGS IN UI =====
+// Renders booking cards dynamically in the DOM
 function displayBookings(bookings) {
     const container = document.getElementById("bookings-list");
 
@@ -237,37 +250,39 @@ function displayBookings(bookings) {
 
     container.innerHTML = "";
 
+    // Show fallback message if no bookings exist
     if (bookings.length === 0) {
         container.innerHTML = "<p>No bookings found.</p>";
         return;
     }
 
-    // create UI cards for each booking
+    // Create a card for each booking
     bookings.forEach(b => {
         const div = document.createElement("div");
         div.className = "booking";
         div.id = `booking-${b.id}`;
 
         div.innerHTML = `
-                <div class="booking-content">
-                    <div class="image-placeholder"></div>
+            <div class="booking-content">
+                <div class="image-placeholder"></div>
 
-                    <div class="details">
-                        <h3>${b.workspace}</h3>
-                        <p class="location">${b.address}</p>
-                        <p>${b.date} at ${b.startTime}</p>
-                        <p>Status: ${b.status}</p>
+                <div class="details">
+                    <h3>${b.workspace}</h3>
+                    <p class="location">${b.address}</p>
+                    <p>${b.date} at ${b.startTime}</p>
+                    <p>Status: ${b.status}</p>
 
-                        <button onclick="cancelBooking(${b.id})">Cancel Booking</button>
-                    </div>
+                    <button onclick="cancelBooking(${b.id})">Cancel Booking</button>
                 </div>
-            `;
+            </div>
+        `;
 
         container.appendChild(div);
     });
 }
 
 // ===== CANCEL BOOKING =====
+// Sends DELETE request and removes booking from UI
 async function cancelBooking(bookingId) {
     const confirmed = confirm("Are you sure you want to cancel this booking?");
     if (!confirmed) return;
@@ -280,11 +295,11 @@ async function cancelBooking(bookingId) {
         const data = await res.json();
 
         if (data.success) {
-            // Remove the booking card from the page
+            // Remove booking card from DOM
             const card = document.getElementById(`booking-${bookingId}`);
             if (card) card.remove();
 
-            // Remove from in-memory array and update summary counts live
+            // Update local state and summary counts
             allBookings = allBookings.filter(b => b.id !== bookingId);
             updateSummary(allBookings);
         } else {
@@ -297,9 +312,10 @@ async function cancelBooking(bookingId) {
 }
 
 // ===== PROFILE ROLE DISPLAY =====
+// Controls visibility of UI elements based on user role
 function applyProfileRole() {
     const roleLabel = document.getElementById("profile-role-label");
-    if (!roleLabel) return; // not on profile page
+    if (!roleLabel) return;
 
     const role = localStorage.getItem("userRole") || "coworker";
 
@@ -310,11 +326,14 @@ function applyProfileRole() {
     if (role !== "owner") {
         const addSection = document.getElementById("add-property-section");
         const yourSection = document.getElementById("your-properties-section");
+
         if (addSection) addSection.style.display = "none";
         if (yourSection) yourSection.style.display = "none";
     }
 }
 
+// ===== CALENDAR SLOTS =====
+// Displays booked time slots for a selected date
 async function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
@@ -324,12 +343,14 @@ async function renderCalendarSlots() {
     const date = dateInput.value;
     if (!date) return;
 
+    // Get property ID from URL
     const propertyId = parseInt(new URLSearchParams(window.location.search).get("id"));
 
     try {
         const res = await fetch('/data/bookings');
         const bookings = await res.json();
 
+        // Filter bookings for this property and date
         const propertyBookings = bookings.filter(
             b => b.propertyId === propertyId && b.date === date
         );
@@ -341,6 +362,7 @@ async function renderCalendarSlots() {
             return;
         }
 
+        // Display each booked slot
         propertyBookings.forEach(b => {
             const div = document.createElement("div");
             div.className = "slot";
@@ -358,6 +380,7 @@ async function renderCalendarSlots() {
 // save user profile info to localStorage
 function savePersonalInfo() {
     const userId = localStorage.getItem('userId');
+
     const info = {
         name: document.getElementById('profile-name')?.value || '',
         phone: document.getElementById('profile-phone')?.value || '',
@@ -368,11 +391,12 @@ function savePersonalInfo() {
         province: document.getElementById('profile-province')?.value || '',
         country: document.getElementById('profile-country')?.value || ''
     };
+
     localStorage.setItem(`personalInfo_${userId}`, JSON.stringify(info));
     setPersonalInfoMode('view');
 }
 
-// switch to edit mode
+// Switch profile section to edit mode
 function editPersonalInfo() {
     setPersonalInfoMode('edit');
 }
@@ -394,7 +418,7 @@ function setPersonalInfoMode(mode) {
     }
 }
 
-// load saved personal info into form
+// Load saved personal info into form fields
 function loadPersonalInfo() {
     const userId = localStorage.getItem('userId');
     const saved = JSON.parse(localStorage.getItem(`personalInfo_${userId}`) || 'null');
@@ -410,7 +434,7 @@ function loadPersonalInfo() {
     if (resolvedName) {
         nameField.value = resolvedName;
     } else if (userId) {
-        // Fetch name from server for users who logged in before name was stored
+        // Fetch from server if not available locally
         fetch(`/user?id=${userId}`)
             .then(res => res.json())
             .then(data => {
