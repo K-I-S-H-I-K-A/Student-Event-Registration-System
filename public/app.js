@@ -11,6 +11,11 @@ function login() {
     const email = document.getElementById("email").value; // get email input
     const password = document.getElementById("password").value; // get password input
 
+    if (!email || !password) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
     // send login request to backend
     fetch('/login', {
         method: 'POST',
@@ -22,8 +27,10 @@ function login() {
             if (data.success) {
                 alert("Login successful!");
 
-                // store logged-in user ID in localStorage
+                // store logged-in user ID, name and role in localStorage
                 localStorage.setItem("userId", data.id);
+                if (data.name) localStorage.setItem("userName", data.name);
+                if (data.role) localStorage.setItem("userRole", data.role);
 
                 // redirect to home page
                 window.location.href = "index.html";
@@ -48,6 +55,11 @@ function registerUser() {
         role: document.getElementById("role").value
     };
 
+    if (!user.email || !user.name || !user.phone || !user.password) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
     // send registration request
     fetch('/register', {
         method: 'POST',
@@ -69,6 +81,17 @@ function registerUser() {
             console.error(err);
             alert("Server error");
         });
+}
+
+// ===== PROFILE GUARD =====
+function goToProfile() {
+    const userId = localStorage.getItem("userId");
+    if (userId && userId !== "0") {
+        window.location.href = "profile.html";
+    } else {
+        alert("You need to be logged in to view your profile.");
+        window.location.href = "login.html";
+    }
 }
 
 // ===== UPDATE AUTH BUTTON UI =====
@@ -93,11 +116,16 @@ function handleAuth() {
     if (userId && userId !== "0") {
         // logout: remove user from storage
         localStorage.removeItem("userId");
+        localStorage.removeItem("userRole");
 
         updateAuthButton();
 
-        // refresh page after logout
-        window.location.reload();
+        // redirect to home page if logging out from profile, otherwise reload
+        if (window.location.pathname.includes("profile.html")) {
+            window.location.href = "index.html";
+        } else {
+            window.location.reload();
+        }
     } else {
         // redirect to login page if not logged in
         window.location.href = "login.html";
@@ -268,7 +296,46 @@ async function cancelBooking(bookingId) {
     }
 }
 
-async function renderCalendarSlots() {
+document.addEventListener("DOMContentLoaded", () => {
+    // Remove legacy unscoped keys left over from before user-scoping was added
+    localStorage.removeItem('personalInfo');
+    localStorage.removeItem('paymentMethods');
+
+    updateAuthButton();
+    // Load saved payment methods and render them if on the profile page
+    const _userId1 = localStorage.getItem('userId');
+    paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId1}`) || '[]');
+    renderPaymentMethods();
+    // Load saved personal info if on the profile page
+    loadPersonalInfo();
+    // Load owner properties from server if on the profile page
+    loadOwnerProperties();
+    // Load all properties for the home page
+    loadAllProperties();
+    // Apply role-based visibility on the profile page
+    applyProfileRole();
+});
+
+// ===== PROFILE ROLE DISPLAY =====
+function applyProfileRole() {
+    const roleLabel = document.getElementById("profile-role-label");
+    if (!roleLabel) return; // not on profile page
+
+    const role = localStorage.getItem("userRole") || "coworker";
+
+    // Update the role label
+    roleLabel.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+    // Hide owner-only sections for coworkers
+    if (role !== "owner") {
+        const addSection = document.getElementById("add-property-section");
+        const yourSection = document.getElementById("your-properties-section");
+        if (addSection) addSection.style.display = "none";
+        if (yourSection) yourSection.style.display = "none";
+    }
+}
+
+function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
 
@@ -310,7 +377,9 @@ async function renderCalendarSlots() {
 
 // save user profile info to localStorage
 function savePersonalInfo() {
+    const userId = localStorage.getItem('userId');
     const info = {
+        name: document.getElementById('profile-name')?.value || '',
         phone: document.getElementById('profile-phone')?.value || '',
         email: document.getElementById('profile-email')?.value || '',
         address: document.getElementById('profile-address')?.value || '',
@@ -319,7 +388,7 @@ function savePersonalInfo() {
         province: document.getElementById('profile-province')?.value || '',
         country: document.getElementById('profile-country')?.value || ''
     };
-    localStorage.setItem('personalInfo', JSON.stringify(info));
+    localStorage.setItem(`personalInfo_${userId}`, JSON.stringify(info));
     setPersonalInfoMode('view');
 }
 
@@ -347,13 +416,36 @@ function setPersonalInfoMode(mode) {
 
 // load saved personal info into form
 function loadPersonalInfo() {
-    const saved = JSON.parse(localStorage.getItem('personalInfo') || 'null');
+    const userId = localStorage.getItem('userId');
+    const saved = JSON.parse(localStorage.getItem(`personalInfo_${userId}`) || 'null');
+
+    const nameField = document.getElementById('profile-name');
+    if (!nameField) return; // not on profile page
+
+    // Get name from saved info or localStorage, falling back to server fetch
+    const storedName = localStorage.getItem('userName');
+    const validStoredName = storedName && storedName !== 'undefined' ? storedName : null;
+    const resolvedName = saved?.name || validStoredName;
+
+    if (resolvedName) {
+        nameField.value = resolvedName;
+    } else if (userId) {
+        // Fetch name from server for users who logged in before name was stored
+        fetch(`/user?id=${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.name) {
+                    localStorage.setItem('userName', data.name);
+                    nameField.value = data.name;
+                }
+            })
+            .catch(() => {});
+    }
+
     if (!saved) return;
 
     const phone = document.getElementById('profile-phone');
-    if (!phone) return; // not on profile page
-
-    // populate fields
+    if (!phone) return;
     phone.value = saved.phone || '';
     document.getElementById('profile-email').value = saved.email || '';
     document.getElementById('profile-address').value = saved.address || '';
@@ -364,6 +456,35 @@ function loadPersonalInfo() {
 
     setPersonalInfoMode('view');
 }
+
+// ===== DOM CONTENT LOADED INITIALIZATION =====
+document.addEventListener("DOMContentLoaded", () => {
+    updateAuthButton();
+
+    // load profile-related data if present
+    const _userId2 = localStorage.getItem('userId');
+    paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId2}`) || '[]');
+    renderPaymentMethods();
+
+    loadPersonalInfo();
+
+    const durationSelect = document.getElementById("duration");
+    if (durationSelect) {
+        durationSelect.addEventListener("change", updatePricing);
+    }
+
+    const bookBtn = document.getElementById("bookNowBtn");
+    if (bookBtn) {
+        bookBtn.addEventListener("click", bookNow);
+    }
+
+    const dateInput = document.getElementById("bookingDate");
+    if (dateInput) {
+        dateInput.addEventListener("change", renderCalendarSlots);
+    }
+
+    renderCalendarSlots();
+});
 
 // ===== PROPERTIES =====
 
@@ -570,10 +691,21 @@ function renderPaymentMethods() {
     const subsection = document.getElementById('payment-methods-subsection');
     const addBtn = document.getElementById('payment-add-btn');
     if (subsection) subsection.style.display = paymentMethods.length > 0 ? 'block' : 'none';
-    if (addBtn) addBtn.textContent = paymentMethods.length > 0 ? '+ Add More Payment Methods' : '+ Add Payment Method';
+    if (addBtn) {
+        if (paymentMethods.length >= 3) {
+            addBtn.textContent = 'Payment method limit reached';
+            addBtn.disabled = true;
+        } else {
+            addBtn.textContent = paymentMethods.length > 0 ? '+ Add More Payment Methods' : '+ Add Payment Method';
+            addBtn.disabled = false;
+        }
+    }
 }
 
 function openPaymentModal(index) {
+    // Block adding new when limit reached (editing existing is still allowed)
+    if (index === undefined && paymentMethods.length >= 3) return;
+
     const overlay = document.getElementById('payment-overlay');
     const deleteBtn = document.getElementById('payment-delete-btn');
     const confirmBtn = overlay.querySelector('.payment-confirm-btn');
@@ -657,7 +789,8 @@ function savePaymentMethod() {
         paymentMethods.push(method);
     }
 
-    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    const userId = localStorage.getItem('userId');
+    localStorage.setItem(`paymentMethods_${userId}`, JSON.stringify(paymentMethods));
     renderPaymentMethods();
     closePaymentModal();
 }
@@ -668,7 +801,8 @@ function deletePaymentMethod() {
     if (!confirmed) return;
 
     paymentMethods.splice(editingPaymentIndex, 1);
-    localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+    const userId = localStorage.getItem('userId');
+    localStorage.setItem(`paymentMethods_${userId}`, JSON.stringify(paymentMethods));
     renderPaymentMethods();
     closePaymentModal();
 }

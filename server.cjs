@@ -108,7 +108,8 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify({
                         success: true,
                         role: user.role,
-                        id: user.id
+                        id: user.id,
+                        name: user.name
                     }));
                 } else {
                     // Invalid credentials
@@ -121,6 +122,23 @@ const server = http.createServer((req, res) => {
                 res.end("Server Error");
             }
         });
+    }
+
+    // ===== GET USER BY ID =====
+    // Returns the name of a user by their ID (no password exposed)
+    else if (req.method === 'GET' && req.url.startsWith('/user')) {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const userId = parseInt(url.searchParams.get('id'));
+
+        try {
+            const users = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+            const user = users.find(u => u.id === userId);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(user ? { name: user.name } : { name: '' }));
+        } catch {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
     }
 
     // ===== GET BOOKINGS FOR USER =====

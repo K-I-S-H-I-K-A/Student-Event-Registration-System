@@ -35,18 +35,39 @@
     "id": 4
   },
   {
-    "workspace": "742 Evergreen Ridge Dr",
-    "address": "742 Evergreen Ridge Dr",
-    "neighbourhood": "Maplewood Heights",
-    "sqft": "1850",
-    "parking": false,
-    "transit": false,
-    "amenities": [],
-    "ownerId": 1,
+    "workspace": "123 Crazy St SW",
+    "address": "123 Crazy St SW",
+    "neighbourhood": "Mahogany",
+    "sqft": "1500",
+    "parking": true,
+    "transit": true,
+    "amenities": [
+      "Parking Space",
+      "Public Transport"
+    ],
+    "ownerId": 4,
     "owner": "",
-    "price": 85,
+    "price": 70,
     "description": "",
     "status": "Not Booked",
     "id": 5
+  },
+  {
+    "workspace": "123 McLaren St NW",
+    "address": "123 McLaren St NW",
+    "neighbourhood": "McLaren",
+    "sqft": "1700",
+    "parking": true,
+    "transit": true,
+    "amenities": [
+      "Parking Space",
+      "Public Transport"
+    ],
+    "ownerId": 7,
+    "owner": "",
+    "price": 70,
+    "description": "",
+    "status": "Not Booked",
+    "id": 6
   }
 ]

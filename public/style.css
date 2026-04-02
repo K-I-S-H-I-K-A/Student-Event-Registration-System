@@ -56,6 +56,22 @@ nav a.active {
     border-bottom: 2px solid #333;
 }
 
+#auth-btn {
+    margin-left: 20px;
+    padding: 7px 18px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#auth-btn:hover {
+    background-color: #555;
+}
+
 /* HERO SECTION */
 .hero {
     text-align: center;
