@@ -106,5 +106,17 @@
     "serviceFee": 13.5,
     "total": 463.5,
     "id": 13
+  },
+  {
+    "userId": 7,
+    "propertyId": 3,
+    "date": "2026-04-08",
+    "startTime": "10:10",
+    "duration": 6,
+    "hourlyRate": 100,
+    "subtotal": 600,
+    "serviceFee": 18,
+    "total": 618,
+    "id": 14
   }
 ]

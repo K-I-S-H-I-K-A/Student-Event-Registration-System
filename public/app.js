@@ -121,6 +121,9 @@ function handleAuth() {
     const userId = localStorage.getItem("userId");
 
     if (userId && userId !== "0") {
+        const confirmed = confirm("Are you sure you want to logout?");
+        if (!confirmed) return;
+
         // logout: remove user from storage
         localStorage.removeItem("userId");
         localStorage.removeItem("userRole");
@@ -1013,7 +1016,7 @@ async function loadPropertyDetails() {
     if (amenitiesList) {
         if (selectedProperty.amenities && selectedProperty.amenities.length > 0) {
             amenitiesList.innerHTML = selectedProperty.amenities
-                .map(a => `<li>${a}</li>`)
+                .map(a => `<span class="amenity-tag">${a}</span>`)
                 .join("");
         } else {
             amenitiesList.innerHTML = "<p>No amenities available.</p>";
@@ -1023,10 +1026,16 @@ async function loadPropertyDetails() {
     // ===== OWNER NAME =====
     const ownerNameEl = document.getElementById("ownerName");
 
-    if (ownerNameEl) {
-        ownerNameEl.textContent = selectedProperty.owner
-            ? selectedProperty.owner
-            : "Unknown Host";
+    if (ownerNameEl && selectedProperty.ownerId) {
+        try {
+            const userRes = await fetch(`/user?id=${selectedProperty.ownerId}`);
+            const userData = await userRes.json();
+            ownerNameEl.textContent = userData.name || "Unknown Host";
+        } catch {
+            ownerNameEl.textContent = "Unknown Host";
+        }
+    } else if (ownerNameEl) {
+        ownerNameEl.textContent = "Unknown Host";
     }
     
     // Render price initially

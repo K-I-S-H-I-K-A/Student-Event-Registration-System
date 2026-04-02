@@ -475,6 +475,35 @@ footer {
 .amenity:nth-child(3n) {
     border-right: none;
 }
+/* AMENITIES TAGS */
+#amenitiesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 20px;
+}
+
+.amenity-tag {
+    padding: 6px 14px;
+    background-color: #e9ecef;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #333;
+}
+
+/* PROPERTY DESCRIPTION */
+#propertyDescription {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+    margin: 10px 0 20px;
+}
+
 /* OWNER */
 .owner-box {
     display: flex;
