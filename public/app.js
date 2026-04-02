@@ -296,26 +296,6 @@ async function cancelBooking(bookingId) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Remove legacy unscoped keys left over from before user-scoping was added
-    localStorage.removeItem('personalInfo');
-    localStorage.removeItem('paymentMethods');
-
-    updateAuthButton();
-    // Load saved payment methods and render them if on the profile page
-    const _userId1 = localStorage.getItem('userId');
-    paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId1}`) || '[]');
-    renderPaymentMethods();
-    // Load saved personal info if on the profile page
-    loadPersonalInfo();
-    // Load owner properties from server if on the profile page
-    loadOwnerProperties();
-    // Load all properties for the home page
-    loadAllProperties();
-    // Apply role-based visibility on the profile page
-    applyProfileRole();
-});
-
 // ===== PROFILE ROLE DISPLAY =====
 function applyProfileRole() {
     const roleLabel = document.getElementById("profile-role-label");
@@ -335,7 +315,7 @@ function applyProfileRole() {
     }
 }
 
-function renderCalendarSlots() {
+async function renderCalendarSlots() {
     const dateInput = document.getElementById("bookingDate");
     const container = document.getElementById("calendar-slots");
 
@@ -456,35 +436,6 @@ function loadPersonalInfo() {
 
     setPersonalInfoMode('view');
 }
-
-// ===== DOM CONTENT LOADED INITIALIZATION =====
-document.addEventListener("DOMContentLoaded", () => {
-    updateAuthButton();
-
-    // load profile-related data if present
-    const _userId2 = localStorage.getItem('userId');
-    paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId2}`) || '[]');
-    renderPaymentMethods();
-
-    loadPersonalInfo();
-
-    const durationSelect = document.getElementById("duration");
-    if (durationSelect) {
-        durationSelect.addEventListener("change", updatePricing);
-    }
-
-    const bookBtn = document.getElementById("bookNowBtn");
-    if (bookBtn) {
-        bookBtn.addEventListener("click", bookNow);
-    }
-
-    const dateInput = document.getElementById("bookingDate");
-    if (dateInput) {
-        dateInput.addEventListener("change", renderCalendarSlots);
-    }
-
-    renderCalendarSlots();
-});
 
 // ===== PROPERTIES =====
 
@@ -1093,7 +1044,14 @@ async function loadBookingConfirmation() {
 
 // ===== DOM CONTENT LOADED INITIALIZATION =====
 document.addEventListener("DOMContentLoaded", () => {
+    // Remove legacy unscoped keys left over from before user-scoping was added
+    localStorage.removeItem('personalInfo');
+    localStorage.removeItem('paymentMethods');
+
     updateAuthButton();
+
+    // Apply role-based visibility on the profile page
+    applyProfileRole();
 
     loadPersonalInfo();
 
@@ -1103,8 +1061,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load all properties for the home page
     loadAllProperties();
 
+    // Load property details if on the details page
     loadPropertyDetails();
 
+    // Load booking confirmation details if on the confirmation page
     loadBookingConfirmation();
 
     const bookingsList = document.getElementById("bookings-list");
@@ -1114,8 +1074,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderCalendarSlots();
 
-    // Load saved payment methods and render them if on the profile page
-    paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+   // Load saved payment methods and render them if on the profile page
+    const _userId1 = localStorage.getItem('userId');
+    paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId1}`) || '[]');
     renderPaymentMethods();
 
     const durationSelect = document.getElementById("duration");
