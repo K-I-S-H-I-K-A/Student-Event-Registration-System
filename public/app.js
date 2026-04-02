@@ -1061,6 +1061,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load all properties for the home page
     loadAllProperties();
 
+    // Load property details if on the details page
     loadPropertyDetails();
 
     loadBookingConfirmation();
