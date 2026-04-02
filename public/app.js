@@ -1064,6 +1064,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load property details if on the details page
     loadPropertyDetails();
 
+    // Load booking confirmation details if on the confirmation page
     loadBookingConfirmation();
 
     const bookingsList = document.getElementById("bookings-list");
