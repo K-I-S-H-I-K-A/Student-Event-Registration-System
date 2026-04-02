@@ -694,23 +694,31 @@ function renderWorkspaceCards(list) {
 
     container.innerHTML = '';
 
-    if (list.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#777;">No workspaces available under this filter.</p>';
-        return;
-    }
-
     list.forEach(p => {
-        const card = document.createElement('a');
+        const card = document.createElement('div');
         card.className = 'card';
-        card.href = `Workplace-details.html?id=${p.id}`;
+
         card.innerHTML = `
             <div class="image-placeholder"></div>
+
             <p><strong>${p.workspace || p.address}</strong></p>
             <p>${p.address}</p>
-            <p>$${p.price}/hr</p>
+
+            <p><strong>Size:</strong> ${p.sqft} sqft</p>
+
+            <p><strong>$${p.price}/hr</strong></p>
+
+            <button class="book-now-btn" onclick="goToWorkspace(${p.id})">
+                Book Now
+            </button>
         `;
+
         container.appendChild(card);
     });
+}
+
+function goToWorkspace(id) {
+    window.location.href = `workplace-details.html?id=${id}`;
 }
 
 function handleSearch() {
@@ -723,43 +731,53 @@ function handleSearch() {
     renderWorkspaceCards(filtered);
 }
 
-async function loadHomepageProperties() {
-    const container = document.getElementById("workspace-list");
-    if (!container) return;
+function applyAdvancedFilter() {
+    let filtered = [...allProperties];
 
-    try {
-        const res = await fetch('/data/properties');
-        const properties = await res.json();
+    const amenity = document.getElementById("amenityFilter")?.value;
+    const neighbourhood = document.getElementById("neighbourhoodFilter")?.value;
 
-        container.innerHTML = "";
+    const sqftCondition = document.getElementById("sqftCondition")?.value;
+    const sqftValue = parseFloat(document.getElementById("sqftValue")?.value);
 
-        if (properties.length === 0) {
-            container.innerHTML = "<p>No workspaces available.</p>";
-            return;
-        }
+    const priceCondition = document.getElementById("priceCondition")?.value;
+    const priceValue = parseFloat(document.getElementById("priceValue")?.value);
 
-        properties.forEach(p => {
-            const div = document.createElement("div");
-            div.className = "card";
-
-            div.innerHTML = `
-                <div class="image-placeholder"></div>
-
-                <p><strong>${p.workspace}</strong></p>
-                <p>${p.address}</p>
-                <p>${p.sqft} sqft</p>
-                <p>${p.price ? '$' + p.price + '/hr' : 'Price not available'}</p>
-
-                <button onclick="window.location.href='Workplace-details.html?id=${p.id}'">
-                    Book Now
-                </button>
-            `;
-
-            container.appendChild(div);
-        });
-    } catch (err) {
-        console.error('Error loading homepage properties:', err);
+    // Amenity filter
+    if (amenity) {
+        filtered = filtered.filter(p =>
+            p.amenities && p.amenities.includes(amenity)
+        );
     }
+
+    // Neighbourhood filter
+    if (neighbourhood) {
+        filtered = filtered.filter(p =>
+            p.neighbourhood === neighbourhood
+        );
+    }
+
+    // Sqft filter
+    if (sqftCondition && !isNaN(sqftValue)) {
+        filtered = filtered.filter(p => {
+            const sqft = parseFloat(p.sqft);
+
+            if (sqftCondition === "gt") return sqft > sqftValue;
+            if (sqftCondition === "lt") return sqft < sqftValue;
+            if (sqftCondition === "eq") return sqft === sqftValue;
+        });
+    }
+
+    // Price filter
+    if (priceCondition && !isNaN(priceValue)) {
+        filtered = filtered.filter(p => {
+            if (priceCondition === "gt") return p.price > priceValue;
+            if (priceCondition === "lt") return p.price < priceValue;
+            if (priceCondition === "eq") return p.price === priceValue;
+        });
+    }
+
+    renderWorkspaceCards(filtered);
 }
 
 let selectedProperty = null;
@@ -782,6 +800,28 @@ async function loadPropertyDetails() {
     document.querySelector(".location").textContent = selectedProperty.address;
     document.getElementById("propertyDescription").textContent = selectedProperty.description || "";
 
+    // ===== AMENITIES =====
+    const amenitiesList = document.getElementById("amenitiesList");
+
+    if (amenitiesList) {
+        if (selectedProperty.amenities && selectedProperty.amenities.length > 0) {
+            amenitiesList.innerHTML = selectedProperty.amenities
+                .map(a => `<li>${a}</li>`)
+                .join("");
+        } else {
+            amenitiesList.innerHTML = "<p>No amenities available.</p>";
+        }
+    }
+
+    // ===== OWNER NAME =====
+    const ownerNameEl = document.getElementById("ownerName");
+
+    if (ownerNameEl) {
+        ownerNameEl.textContent = selectedProperty.owner
+            ? selectedProperty.owner
+            : "Unknown Host";
+    }
+    
     // Render price initially
     updatePricing();
 }
@@ -929,9 +969,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load all properties for the home page
     loadAllProperties();
 
-    // Load properties for the home page (if applicable)
-    loadHomepageProperties();
-
     loadPropertyDetails();
 
     loadBookingConfirmation();
@@ -960,5 +997,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateInput = document.getElementById("bookingDate");
     if (dateInput) {
         dateInput.addEventListener("change", renderCalendarSlots);
+    }
+
+    const filterBtn = document.getElementById("filterBtn");
+    const filterMenu = document.getElementById("filterMenu");
+
+    if (filterBtn && filterMenu) {
+        filterBtn.addEventListener("click", () => {
+            filterMenu.classList.toggle("hidden");
+        });
     }
 });
