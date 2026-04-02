@@ -38,43 +38,51 @@
             <div id="filterMenu" class="filter-menu hidden">
 
                 <!-- Amenities -->
-                <label>Amenities</label>
-                <select id="amenityFilter">
-                    <option value="">Any</option>
-                    <option value="Parking Space">Parking Space</option>
-                    <option value="Public Transport">Public Transport</option>
-                    <option value="High Speed Wifi">Wifi</option>
-                    <option value="transit">Transit</option>
-                </select>
+                <div class="filter-group">
+                    <label>Amenities</label>
+                    <select id="amenityFilter">
+                        <option value="">Any</option>
+                        <option value="Parking Space">Parking Space</option>
+                        <option value="Public Transport">Public Transport</option>
+                        <option value="Wi-Fi">Wi-Fi</option>
+                        <option value="Meeting Rooms">Meeting Rooms</option>
+                        <option value="Quiet Zone">Quiet Zone</option>
+                    </select>
+                </div>
 
                 <!-- Neighbourhood -->
-                <label>Neighbourhood</label>
-                <select id="neighbourhoodFilter">
-                    <option value="">Any</option>
-                    <option value="Discoveryland">Discoveryland</option>
-                    <option value="Disney Land">Disney Land</option>
-                    <option value="Maplewood Heights">Maplewood Heights</option>
-                </select>
+                <div class="filter-group">
+                    <label>Neighbourhood</label>
+                    <input type="text" id="neighbourhoodFilter" placeholder="Search neighbourhood...">
+                </div>
 
                 <!-- Sqft -->
-                <label>Sqft</label>
-                <select id="sqftCondition">
-                    <option value="">Select</option>
-                    <option value="gt">&gt;</option>
-                    <option value="lt">&lt;</option>
-                    <option value="eq">=</option>
-                </select>
-                <input type="number" id="sqftValue" placeholder="Enter sqft" />
+                <div class="filter-group-price">
+                    <label>Sqft</label>
+                    <div class="filter-price-row">
+                        <select id="sqftCondition">
+                            <option value="">All</option>
+                            <option value="gt">&gt;</option>
+                            <option value="lt">&lt;</option>
+                            <option value="eq">=</option>
+                        </select>
+                        <input type="number" id="sqftValue" placeholder="sqft" />
+                    </div>
+                </div>
 
                 <!-- Price -->
-                <label>Price</label>
-                <select id="priceCondition">
-                    <option value="">Select</option>
-                    <option value="gt">&gt;</option>
-                    <option value="lt">&lt;</option>
-                    <option value="eq">=</option>
-                </select>
-                <input type="number" id="priceValue" placeholder="Enter price" />
+                <div class="filter-group-price">
+                    <label>Price</label>
+                    <div class="filter-price-row">
+                        <select id="priceCondition">
+                            <option value="">All</option>
+                            <option value="gt">&gt;</option>
+                            <option value="lt">&lt;</option>
+                            <option value="eq">=</option>
+                        </select>
+                        <input type="number" id="priceValue" placeholder="$/hr" />
+                    </div>
+                </div>
 
                 <!-- Apply Button -->
                 <button onclick="applyAdvancedFilter()">Apply</button>

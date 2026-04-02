@@ -124,15 +124,112 @@ nav a.active {
 .filter-container {
     margin: 10px 0;
     position: relative;
+    display: inline-block;
+}
+
+#filterBtn,
+.profile-filter-btn {
+    padding: 7px 18px;
+    background-color: #e9ecef;
+    color: #333;
+    border: 1px solid #bbb;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#filterBtn:hover,
+.profile-filter-btn:hover {
+    background-color: #d0d4d8;
+}
+
+#profileFilterMenu {
+    left: 0;
+    transform: none;
 }
 
 .filter-menu {
     position: absolute;
-    background: white;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
     border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 5px;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 6px;
     z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 16px;
+    white-space: nowrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-menu label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+.filter-menu select,
+.filter-menu input[type="number"],
+.filter-menu input[type="text"],
+.filter-number-input {
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #f9f9f9;
+    box-sizing: border-box;
+    width: 140px;
+}
+
+.filter-group-price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-group-price .filter-price-row {
+    display: flex;
+    gap: 6px;
+}
+
+.filter-group-price .filter-price-row select {
+    width: 60px;
+}
+
+.filter-group-price .filter-price-row input {
+    width: 90px;
+}
+
+.filter-menu button {
+    padding: 7px 16px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    align-self: flex-end;
+}
+
+.filter-menu button:hover {
+    background-color: #555;
+}
+
+.filter-menu button:hover {
+    background-color: #555;
 }
 
 .hidden {
@@ -159,6 +256,14 @@ nav a.active {
     overflow-x: auto;
     grid-template-columns: repeat(4, 200px);
     flex-wrap: wrap;
+}
+
+.no-results-msg {
+    width: 100%;
+    text-align: center;
+    color: #777;
+    font-size: 15px;
+    padding: 30px 0;
 }
 
 .card {
@@ -637,6 +742,7 @@ footer {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
+    font-family: inherit;
     background: #f9f9f9;
     box-sizing: border-box;
 }
@@ -931,6 +1037,7 @@ footer {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
+    font-family: inherit;
     background: #f9f9f9;
     box-sizing: border-box;
 }

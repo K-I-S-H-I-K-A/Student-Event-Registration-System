@@ -76,6 +76,10 @@
         <div class="profile-form">
 
             <div class="profile-form-row">
+                <input type="text" id="prop-name" class="profile-input-full" placeholder="Workspace Name">
+            </div>
+
+            <div class="profile-form-row">
                 <input type="text" id="prop-address" class="profile-input-full" placeholder="Address">
             </div>
 
@@ -89,11 +93,24 @@
             </div>
 
             <div class="profile-form-row">
+                <textarea id="prop-description" class="profile-input-full" placeholder="Property Description" rows="3"></textarea>
+            </div>
+
+            <div class="profile-form-row">
                 <label class="profile-checkbox-label">
                     <input type="checkbox" id="prop-parking"> Parking
                 </label>
                 <label class="profile-checkbox-label">
                     <input type="checkbox" id="prop-transit"> Public Transport
+                </label>
+                <label class="profile-checkbox-label">
+                    <input type="checkbox" id="prop-wifi"> Wi-Fi
+                </label>
+                <label class="profile-checkbox-label">
+                    <input type="checkbox" id="prop-meeting-rooms"> Meeting Rooms
+                </label>
+                <label class="profile-checkbox-label">
+                    <input type="checkbox" id="prop-quiet-zone"> Quiet Zone
                 </label>
             </div>
 
@@ -105,6 +122,47 @@
     <!-- YOUR PROPERTIES SECTION -->
     <div class="profile-section" id="your-properties-section">
         <h3>Your Properties</h3>
+
+        <div class="filter-container">
+            <button id="profileFilterBtn" class="profile-filter-btn">Filter</button>
+            <div id="profileFilterMenu" class="filter-menu hidden">
+
+                <!-- Amenity -->
+                <div class="filter-group">
+                    <label>Amenity</label>
+                    <select id="profileAmenityFilter">
+                        <option value="">Any</option>
+                        <option value="Parking Space">Parking Space</option>
+                        <option value="Public Transport">Public Transport</option>
+                        <option value="Wi-Fi">Wi-Fi</option>
+                        <option value="Meeting Rooms">Meeting Rooms</option>
+                        <option value="Quiet Zone">Quiet Zone</option>
+                    </select>
+                </div>
+
+                <!-- Neighbourhood -->
+                <div class="filter-group">
+                    <label>Neighbourhood</label>
+                    <input type="text" id="profileNeighbourhoodFilter" placeholder="Search neighbourhood...">
+                </div>
+
+                <!-- Price -->
+                <div class="filter-group-price">
+                    <label>Price</label>
+                    <div class="filter-price-row">
+                        <select id="profilePriceCondition">
+                            <option value="">All</option>
+                            <option value="gt">&gt;</option>
+                            <option value="lt">&lt;</option>
+                            <option value="eq">=</option>
+                        </select>
+                        <input type="number" id="profilePriceValue" placeholder="$/hr">
+                    </div>
+                </div>
+
+                <button onclick="applyPropertyFilter()">Apply</button>
+            </div>
+        </div>
 
         <p id="no-properties-msg" style="font-size:14px; color:#777;">No properties available.</p>
 
@@ -135,6 +193,9 @@
         </div>
 
         <div class="payment-field-row">
+            <input type="text" id="edit-prop-name" class="payment-input-full" placeholder="Workspace Name">
+        </div>
+        <div class="payment-field-row">
             <input type="text" id="edit-prop-address" class="payment-input-full" placeholder="Address">
         </div>
         <div class="payment-field-row">
@@ -145,11 +206,23 @@
             <input type="number" id="edit-prop-price" class="payment-input-half" placeholder="Price/hr" min="0" step="0.01">
         </div>
         <div class="payment-field-row">
+            <textarea id="edit-prop-description" class="payment-input-full" placeholder="Property Description" rows="3"></textarea>
+        </div>
+        <div class="payment-field-row">
             <label class="profile-checkbox-label">
                 <input type="checkbox" id="edit-prop-parking"> Parking
             </label>
             <label class="profile-checkbox-label">
                 <input type="checkbox" id="edit-prop-transit"> Public Transport
+            </label>
+            <label class="profile-checkbox-label">
+                <input type="checkbox" id="edit-prop-wifi"> Wi-Fi
+            </label>
+            <label class="profile-checkbox-label">
+                <input type="checkbox" id="edit-prop-meeting-rooms"> Meeting Rooms
+            </label>
+            <label class="profile-checkbox-label">
+                <input type="checkbox" id="edit-prop-quiet-zone"> Quiet Zone
             </label>
         </div>
 

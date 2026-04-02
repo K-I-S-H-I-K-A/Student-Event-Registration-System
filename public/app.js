@@ -456,31 +456,42 @@ async function loadOwnerProperties() {
 }
 
 async function addProperty() {
+    const workspaceName = document.getElementById('prop-name')?.value.trim();
     const address = document.getElementById('prop-address')?.value.trim();
     const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
     const sqft = document.getElementById('prop-sqft')?.value.trim();
     const price = parseFloat(document.getElementById('prop-price')?.value) || 0;
+    const description = document.getElementById('prop-description')?.value.trim();
     const parking = document.getElementById('prop-parking')?.checked;
     const transit = document.getElementById('prop-transit')?.checked;
+    const wifi = document.getElementById('prop-wifi')?.checked;
+    const meetingRooms = document.getElementById('prop-meeting-rooms')?.checked;
+    const quietZone = document.getElementById('prop-quiet-zone')?.checked;
 
     if (!address || !sqft) return;
 
     const amenities = [];
     if (parking) amenities.push('Parking Space');
     if (transit) amenities.push('Public Transport');
+    if (wifi) amenities.push('Wi-Fi');
+    if (meetingRooms) amenities.push('Meeting Rooms');
+    if (quietZone) amenities.push('Quiet Zone');
 
     const newProperty = {
-        workspace: address,
+        workspace: workspaceName || address,
         address,
         neighbourhood,
         sqft,
         parking,
         transit,
+        wifi,
+        meetingRooms,
+        quietZone,
         amenities,
         ownerId: parseInt(localStorage.getItem('userId')) || null,
         owner: '',
         price,
-        description: '',
+        description,
         status: 'Not Booked'
     };
 
@@ -496,12 +507,17 @@ async function addProperty() {
             properties.push(data.property);
 
             // Clear form
+            document.getElementById('prop-name').value = '';
             document.getElementById('prop-address').value = '';
             document.getElementById('prop-neighbourhood').value = '';
             document.getElementById('prop-sqft').value = '';
             document.getElementById('prop-price').value = '';
+            document.getElementById('prop-description').value = '';
             document.getElementById('prop-parking').checked = false;
             document.getElementById('prop-transit').checked = false;
+            document.getElementById('prop-wifi').checked = false;
+            document.getElementById('prop-meeting-rooms').checked = false;
+            document.getElementById('prop-quiet-zone').checked = false;
 
             renderProperties();
         }
@@ -545,12 +561,17 @@ function openPropertyModal(index) {
     editingPropertyIndex = index;
     const p = properties[index];
 
+    document.getElementById('edit-prop-name').value = p.workspace || '';
     document.getElementById('edit-prop-address').value = p.address;
     document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
     document.getElementById('edit-prop-sqft').value = p.sqft;
     document.getElementById('edit-prop-price').value = p.price != null ? p.price : '';
+    document.getElementById('edit-prop-description').value = p.description || '';
     document.getElementById('edit-prop-parking').checked = p.parking || false;
     document.getElementById('edit-prop-transit').checked = p.transit || false;
+    document.getElementById('edit-prop-wifi').checked = p.wifi || false;
+    document.getElementById('edit-prop-meeting-rooms').checked = p.meetingRooms || false;
+    document.getElementById('edit-prop-quiet-zone').checked = p.quietZone || false;
 
     document.getElementById('property-overlay').classList.add('active');
 }
@@ -566,21 +587,29 @@ function handlePropertyOverlayClick(event) {
 }
 
 async function savePropertyEdit() {
+    const workspaceName = document.getElementById('edit-prop-name').value.trim();
     const address = document.getElementById('edit-prop-address').value.trim();
     const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
     const sqft = document.getElementById('edit-prop-sqft').value.trim();
     const price = parseFloat(document.getElementById('edit-prop-price').value) || 0;
+    const description = document.getElementById('edit-prop-description').value.trim();
     const parking = document.getElementById('edit-prop-parking').checked;
     const transit = document.getElementById('edit-prop-transit').checked;
+    const wifi = document.getElementById('edit-prop-wifi').checked;
+    const meetingRooms = document.getElementById('edit-prop-meeting-rooms').checked;
+    const quietZone = document.getElementById('edit-prop-quiet-zone').checked;
 
     if (!address || !sqft) return;
 
     const amenities = [];
     if (parking) amenities.push('Parking Space');
     if (transit) amenities.push('Public Transport');
+    if (wifi) amenities.push('Wi-Fi');
+    if (meetingRooms) amenities.push('Meeting Rooms');
+    if (quietZone) amenities.push('Quiet Zone');
 
     const p = properties[editingPropertyIndex];
-    const updated = { address, neighbourhood, sqft, price, parking, transit, amenities, workspace: address };
+    const updated = { address, neighbourhood, sqft, price, description, parking, transit, wifi, meetingRooms, quietZone, amenities, workspace: workspaceName || address };
 
     try {
         const res = await fetch(`/properties/${p.id}`, {
@@ -779,6 +808,11 @@ function renderWorkspaceCards(list) {
 
     container.innerHTML = '';
 
+    if (list.length === 0) {
+        container.innerHTML = '<p class="no-results-msg">No Properties Found.</p>';
+        return;
+    }
+
     list.forEach(p => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -838,7 +872,7 @@ function applyAdvancedFilter() {
     // Neighbourhood filter
     if (neighbourhood) {
         filtered = filtered.filter(p =>
-            p.neighbourhood === neighbourhood
+            (p.neighbourhood || '').toLowerCase().includes(neighbourhood.toLowerCase())
         );
     }
 
@@ -863,6 +897,70 @@ function applyAdvancedFilter() {
     }
 
     renderWorkspaceCards(filtered);
+}
+
+// ===== PROFILE PROPERTY FILTER =====
+function applyPropertyFilter() {
+    let filtered = [...properties];
+
+    const amenity = document.getElementById("profileAmenityFilter")?.value;
+    const neighbourhood = document.getElementById("profileNeighbourhoodFilter")?.value;
+    const priceCondition = document.getElementById("profilePriceCondition")?.value;
+    const priceValue = parseFloat(document.getElementById("profilePriceValue")?.value);
+
+    if (amenity) {
+        filtered = filtered.filter(p =>
+            p.amenities && p.amenities.includes(amenity)
+        );
+    }
+
+    if (neighbourhood) {
+        filtered = filtered.filter(p =>
+            (p.neighbourhood || '').toLowerCase().includes(neighbourhood.toLowerCase())
+        );
+    }
+
+    if (priceCondition && !isNaN(priceValue)) {
+        filtered = filtered.filter(p => {
+            if (priceCondition === "gt") return p.price > priceValue;
+            if (priceCondition === "lt") return p.price < priceValue;
+            if (priceCondition === "eq") return p.price === priceValue;
+        });
+    }
+
+    renderFilteredProperties(filtered);
+}
+
+function renderFilteredProperties(list) {
+    const tbody = document.getElementById('properties-tbody');
+    const table = document.getElementById('properties-table');
+    const noMsg = document.getElementById('no-properties-msg');
+
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (list.length === 0) {
+        if (table) table.style.display = 'none';
+        if (noMsg) noMsg.style.display = 'block';
+        return;
+    }
+
+    if (table) table.style.display = 'table';
+    if (noMsg) noMsg.style.display = 'none';
+
+    list.forEach(p => {
+        const realIndex = properties.indexOf(p);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${p.address}</td>
+            <td>${p.neighbourhood || '—'}</td>
+            <td>${p.sqft}</td>
+            <td>${p.price ? '$' + p.price + '/hr' : '—'}</td>
+            <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${realIndex}); return false;">Edit</a></td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 let selectedProperty = null;
@@ -1100,6 +1198,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filterBtn && filterMenu) {
         filterBtn.addEventListener("click", () => {
             filterMenu.classList.toggle("hidden");
+        });
+    }
+
+    const profileFilterBtn = document.getElementById("profileFilterBtn");
+    const profileFilterMenu = document.getElementById("profileFilterMenu");
+
+    if (profileFilterBtn && profileFilterMenu) {
+        profileFilterBtn.addEventListener("click", () => {
+            profileFilterMenu.classList.toggle("hidden");
         });
     }
 });

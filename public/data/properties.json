@@ -53,7 +53,7 @@
     "id": 5
   },
   {
-    "workspace": "123 McLaren St NW",
+    "workspace": "Papaya Winners Rooms",
     "address": "123 McLaren St NW",
     "neighbourhood": "McLaren",
     "sqft": "1700",
@@ -61,13 +61,40 @@
     "transit": true,
     "amenities": [
       "Parking Space",
-      "Public Transport"
+      "Public Transport",
+      "Wi-Fi",
+      "Meeting Rooms",
+      "Quiet Zone"
     ],
     "ownerId": 7,
     "owner": "",
     "price": 70,
     "description": "",
     "status": "Not Booked",
-    "id": 6
+    "id": 6,
+    "wifi": true,
+    "meetingRooms": true,
+    "quietZone": true
+  },
+  {
+    "workspace": "Riverside Apartment",
+    "address": "63 Russel Street NW",
+    "neighbourhood": "Russel-Woods",
+    "sqft": "1000",
+    "parking": true,
+    "transit": false,
+    "wifi": true,
+    "meetingRooms": false,
+    "quietZone": false,
+    "amenities": [
+      "Parking Space",
+      "Wi-Fi"
+    ],
+    "ownerId": 7,
+    "owner": "",
+    "price": 80,
+    "description": "Beautiful apartment with a great river view.",
+    "status": "Not Booked",
+    "id": 7
   }
 ]
