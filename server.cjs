@@ -150,8 +150,8 @@ const server = http.createServer((req, res) => {
         const userId = parseInt(url.searchParams.get('userId'));
 
         // Define file paths
-        const bookingsFile = path.join(__dirname, 'data', 'bookings.json');
-        const propertiesFile = path.join(__dirname, 'data', 'properties.json');
+        const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
+        const propertiesFile = path.join(__dirname, 'public', 'data', 'properties.json');
 
         try {
             // Read bookings data
@@ -220,7 +220,7 @@ const server = http.createServer((req, res) => {
                 // Parse booking data
                 const bookingData = JSON.parse(body);
 
-                const bookingsFile = path.join(__dirname, 'data', 'bookings.json');
+                const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
 
                 let bookings = [];
 
@@ -347,6 +347,25 @@ const server = http.createServer((req, res) => {
                 res.end("Server Error");
             }
         });
+    }
+
+    // ===== DELETE BOOKING =====
+    else if (req.method === 'DELETE' && req.url.startsWith('/bookings/')) {
+        const id = parseInt(req.url.split('/')[2]);
+
+        try {
+            const bookingsFile = path.join(__dirname, 'public', 'data', 'bookings.json');
+            let bookings = JSON.parse(fs.readFileSync(bookingsFile, 'utf-8'));
+
+            bookings = bookings.filter(b => b.id !== id);
+            fs.writeFileSync(bookingsFile, JSON.stringify(bookings, null, 2));
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+        } catch (error) {
+            res.writeHead(500);
+            res.end("Server Error");
+        }
     }
 
     // ===== DELETE PROPERTY =====

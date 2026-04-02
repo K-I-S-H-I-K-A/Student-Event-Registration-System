@@ -121,6 +121,24 @@ nav a.active {
     background-color: #f0f0f0;
 }
 
+.filter-container {
+    margin: 10px 0;
+    position: relative;
+}
+
+.filter-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 5px;
+    z-index: 10;
+}
+
+.hidden {
+    display: none;
+}
+
 .hero p {
     margin-top: 15px;
     color: #555;
