@@ -1,0 +1,33 @@
+============ Test register ===============
+
+Post:
+http://localhost:3000/register
+
+Go to Body > raw > JSON and paste:
+{
+  "email": "test@example.com",
+  "password": "123456",
+  "name": "Test User",
+  "phone": "1234567890",
+  "role": "coworker"
+}
+ 
+============ Test login ==============
+
+Post:
+http://localhost:3000/login
+
+Go to Body > raw > JSON and paste:
+{
+  "email": "test@example.com",
+  "password": "123456"
+}
+
+============ Test AUTH ==============
+
+Get:
+http://localhost:3000/user
+
+Add header:
+
+Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
