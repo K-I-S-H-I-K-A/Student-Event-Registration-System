@@ -7,6 +7,26 @@ let editingPropertyIndex = null; // Tracks which property is being edited
 let paymentMethods = [];     // Saved payment methods (localStorage)
 let editingPaymentIndex = null;  // Tracks which payment method is being edited
 
+// ===== AUTH HELPER FUNCTION =====
+function authFetch(url, options = {}) {
+    const token = localStorage.getItem("token");
+
+    return fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(options.headers || {}),
+            Authorization: `Bearer ${token}`
+        }
+    }).then(res => {
+        if (res.status === 401) {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
+        return res;
+    });
+}
+
 // ===== LOGIN FUNCTION =====
 function login() {
     const email = document.getElementById("email").value; // get email input
@@ -19,7 +39,7 @@ function login() {
     }
 
     // Send login request to backend
-    fetch('/login', {
+    authFetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }) // send credentials
@@ -30,7 +50,8 @@ function login() {
                 alert("Login successful!");
 
                 // store logged-in user ID, name and role in localStorage
-                localStorage.setItem("userId", data.id);
+                localStorage.setItem("userId", data.userId);
+                localStorage.setItem("token", data.token);
                 if (data.name) localStorage.setItem("userName", data.name);
                 if (data.role) localStorage.setItem("userRole", data.role);
 
@@ -64,7 +85,7 @@ function registerUser() {
     }
 
     // Send registration request to backend
-    fetch('/register', {
+    authFetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
@@ -153,11 +174,11 @@ async function loadBookings() {
         }
 
         // Fetch bookings for user
-        const res = await fetch(`/data/bookings?userId=${userId}`);
+        const res = await authFetch(`/data/bookings?userId=${userId}`);
         const bookings = await res.json();
 
         // Fetch all properties (needed for summary calculations)
-        const propertyRes = await fetch('/data/properties');
+        const propertyRes = await authFetch('/data/properties');
         const properties = await propertyRes.json();
 
         allBookings = bookings;
@@ -291,7 +312,7 @@ async function cancelBooking(bookingId) {
     if (!confirmed) return;
 
     try {
-        const res = await fetch(`/bookings/${bookingId}`, {
+        const res = await authFetch(`/bookings/${bookingId}`, {
             method: 'DELETE'
         });
 
@@ -350,7 +371,7 @@ async function renderCalendarSlots() {
     const propertyId = parseInt(new URLSearchParams(window.location.search).get("id"));
 
     try {
-        const res = await fetch('/data/bookings');
+        const res = await authFetch('/data/bookings');
         const bookings = await res.json();
 
         // Filter bookings for this property and date
@@ -438,7 +459,7 @@ function loadPersonalInfo() {
         nameField.value = resolvedName;
     } else if (userId) {
         // Fetch from server if not available locally
-        fetch(`/user?id=${userId}`)
+        authFetch(`/user?id=${userId}`)
             .then(res => res.json())
             .then(data => {
                 if (data.name) {
@@ -446,7 +467,7 @@ function loadPersonalInfo() {
                     nameField.value = data.name;
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     if (!saved) return;
@@ -473,7 +494,7 @@ async function loadOwnerProperties() {
     const userId = parseInt(localStorage.getItem('userId'));
 
     try {
-        const res = await fetch('/data/properties');
+        const res = await authFetch('/data/properties');
         const all = await res.json();
         properties = all.filter(p => p.ownerId === userId);
         renderProperties();
@@ -523,7 +544,7 @@ async function addProperty() {
     };
 
     try {
-        const res = await fetch('/properties', {
+        const res = await authFetch('/properties', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newProperty)
@@ -639,7 +660,7 @@ async function savePropertyEdit() {
     const updated = { address, neighbourhood, sqft, price, description, parking, transit, wifi, meetingRooms, quietZone, amenities, workspace: workspaceName || address };
 
     try {
-        const res = await fetch(`/properties/${p.id}`, {
+        const res = await authFetch(`/properties/${p.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updated)
@@ -662,7 +683,7 @@ async function deleteProperty() {
         const p = properties[editingPropertyIndex];
 
         try {
-            const res = await fetch(`/properties/${p.id}`, { method: 'DELETE' });
+            const res = await authFetch(`/properties/${p.id}`, { method: 'DELETE' });
             const data = await res.json();
 
             if (data.success) {
@@ -821,7 +842,7 @@ async function loadAllProperties() {
     if (!container) return;
 
     try {
-        const res = await fetch('/data/properties');
+        const res = await authFetch('/data/properties');
         allProperties = await res.json();
         renderWorkspaceCards(allProperties);
     } catch (err) {
@@ -998,7 +1019,7 @@ async function loadPropertyDetails() {
 
     if (!id) return;
 
-    const res = await fetch('/data/properties');
+    const res = await authFetch('/data/properties');
     const properties = await res.json();
 
     selectedProperty = properties.find(p => p.id === id);
@@ -1028,7 +1049,7 @@ async function loadPropertyDetails() {
 
     if (ownerNameEl && selectedProperty.ownerId) {
         try {
-            const userRes = await fetch(`/user?id=${selectedProperty.ownerId}`);
+            const userRes = await authFetch(`/user?id=${selectedProperty.ownerId}`);
             const userData = await userRes.json();
             ownerNameEl.textContent = userData.name || "Unknown Host";
         } catch {
@@ -1037,7 +1058,7 @@ async function loadPropertyDetails() {
     } else if (ownerNameEl) {
         ownerNameEl.textContent = "Unknown Host";
     }
-    
+
     // Render price initially
     updatePricing();
 }
@@ -1115,7 +1136,7 @@ async function bookNow() {
     };
 
     try {
-        const res = await fetch('/book', {
+        const res = await authFetch('/book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(booking)
@@ -1149,7 +1170,7 @@ async function loadBookingConfirmation() {
     }
 
     try {
-        const propRes = await fetch('/data/properties');
+        const propRes = await authFetch('/data/properties');
         const properties = await propRes.json();
 
         const property = properties.find(p => p.id === saved.propertyId);
@@ -1178,6 +1199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Remove legacy unscoped keys left over from before user-scoping was added
     localStorage.removeItem('personalInfo');
     localStorage.removeItem('paymentMethods');
+    localStorage.removeItem("token");
 
     updateAuthButton();
 
@@ -1205,7 +1227,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderCalendarSlots();
 
-   // Load saved payment methods and render them if on the profile page
+    // Load saved payment methods and render them if on the profile page
     const _userId1 = localStorage.getItem('userId');
     paymentMethods = JSON.parse(localStorage.getItem(`paymentMethods_${_userId1}`) || '[]');
     renderPaymentMethods();
