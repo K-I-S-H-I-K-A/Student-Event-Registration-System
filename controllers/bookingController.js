@@ -56,3 +56,6 @@ export const deleteBooking = async (req, res) => {
    if (rows.length === 0) {
             return res.status(404).json({ message: "Not found" });
         }
+  await pool.query("DELETE FROM bookings WHERE id = ?", [id]);
+
+        res.json({ success: true });
