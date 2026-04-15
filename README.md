@@ -11,3 +11,5 @@ This app is a group project designed to connect property owners with people look
 - Added a search and filter feature for Coworkers to find spaces.
 - Added a booking page, booking confirmation and profile page.
 - **Note** At this stage, all data is stored in Json.
+## Phase 2
+- Booking feature implemented with data 
