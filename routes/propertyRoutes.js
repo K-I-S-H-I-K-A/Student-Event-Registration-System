@@ -1,4 +1,3 @@
-// routes/propertyRoutes.js
 import express from "express";
 import {
     createProperty,
@@ -8,7 +7,7 @@ import {
     deleteProperty
 } from "../controllers/propertyController.js";
 
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -17,8 +16,8 @@ router.get("/", getAllProperties);
 router.get("/:id", getPropertyById);
 
 // Protected
-router.post("/", verifyToken, createProperty);
-router.put("/:id", verifyToken, updateProperty);
-router.delete("/:id", verifyToken, deleteProperty);
+router.post("/", authMiddleware, createProperty);
+router.put("/:id", authMiddleware, updateProperty);
+router.delete("/:id", authMiddleware, deleteProperty);
 
 export default router;
