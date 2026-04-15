@@ -43,3 +43,13 @@ export const getBookingById = async (req, res) => {
         res.status(500).json({ success: false });
     }
 };
+
+// ===== DELETE BOOKING =====
+export const deleteBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [rows] = await pool.query(
+            "SELECT * FROM bookings WHERE id = ?",
+            [id]
+        );
