@@ -53,3 +53,6 @@ export const deleteBooking = async (req, res) => {
             "SELECT * FROM bookings WHERE id = ?",
             [id]
         );
+   if (rows.length === 0) {
+            return res.status(404).json({ message: "Not found" });
+        }
