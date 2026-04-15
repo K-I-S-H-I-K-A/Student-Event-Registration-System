@@ -31,3 +31,62 @@ http://localhost:3000/user
 Add header:
 
 Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
+
+============ Create Property ==============
+
+Post:
+http://localhost:3000/properties
+
+Add header:
+
+Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
+
+Go to Body > raw > JSON and paste:
+{
+  "workspace": "Downtown Office",
+  "address": "123 Main St",
+  "neighbourhood": "Downtown",
+  "sqft": 500,
+  "price": 25,
+  "description": "Nice workspace",
+  "amenities": ["Wi-Fi", "Parking"]
+}
+
+============ Get All Properties ==============
+
+Get:
+http://localhost:3000/properties
+
+============ Get 1 Property ==============
+
+Get:
+http://localhost:3000/properties/1
+
+============ Update Properties ==============
+
+Put:
+http://localhost:3000/properties/1
+
+Add header:
+
+Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
+
+Go to Body > raw > JSON and paste:
+{
+  "workspace": "Updated Office",
+  "address": "123 Main St",
+  "neighbourhood": "Downtown",
+  "sqft": 600,
+  "price": 30,
+  "description": "Updated description",
+  "amenities": ["Wi-Fi"]
+}
+
+============ Delete Properties ==============
+
+Delete:
+http://localhost:3000/properties/1
+
+Add header:
+
+Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)

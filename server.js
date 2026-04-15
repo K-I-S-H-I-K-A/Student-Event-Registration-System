@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/authRoutes.js'; 
 import propertyRoutes from "./routes/propertyRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express(); 
 const PORT = 3000; 
@@ -22,6 +23,9 @@ app.use("/auth", authRoutes);
 
 // Property routes
 app.use("/properties", propertyRoutes);
+
+// User routes
+app.use("/users", userRoutes);
 
 // Serve frontend 
 app.use(express.static(path.join(__dirname, 'public')));

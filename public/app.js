@@ -39,7 +39,7 @@ function login() {
     }
 
     // Send login request to backend
-    authFetch('/login', {
+    fetch('/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }) // send credentials
@@ -85,7 +85,7 @@ function registerUser() {
     }
 
     // Send registration request to backend
-    authFetch('/register', {
+    fetch('/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
@@ -174,11 +174,11 @@ async function loadBookings() {
         }
 
         // Fetch bookings for user
-        const res = await authFetch(`/data/bookings?userId=${userId}`);
+        const res = await authFetch(`/bookings?userId=${userId}`);
         const bookings = await res.json();
 
         // Fetch all properties (needed for summary calculations)
-        const propertyRes = await authFetch('/data/properties');
+        const propertyRes = await authFetch('/properties');
         const properties = await propertyRes.json();
 
         allBookings = bookings;
@@ -371,7 +371,7 @@ async function renderCalendarSlots() {
     const propertyId = parseInt(new URLSearchParams(window.location.search).get("id"));
 
     try {
-        const res = await authFetch('/data/bookings');
+        const res = await authFetch('/bookings');
         const bookings = await res.json();
 
         // Filter bookings for this property and date
@@ -459,7 +459,7 @@ function loadPersonalInfo() {
         nameField.value = resolvedName;
     } else if (userId) {
         // Fetch from server if not available locally
-        authFetch(`/user?id=${userId}`)
+        authFetch(`/users/${userId}`)
             .then(res => res.json())
             .then(data => {
                 if (data.name) {
@@ -494,7 +494,7 @@ async function loadOwnerProperties() {
     const userId = parseInt(localStorage.getItem('userId'));
 
     try {
-        const res = await authFetch('/data/properties');
+        const res = await authFetch('/properties');
         const all = await res.json();
         properties = all.filter(p => p.ownerId === userId);
         renderProperties();
@@ -842,7 +842,7 @@ async function loadAllProperties() {
     if (!container) return;
 
     try {
-        const res = await authFetch('/data/properties');
+        const res = await authFetch('/properties');
         allProperties = await res.json();
         renderWorkspaceCards(allProperties);
     } catch (err) {
@@ -1019,7 +1019,7 @@ async function loadPropertyDetails() {
 
     if (!id) return;
 
-    const res = await authFetch('/data/properties');
+    const res = await authFetch('/properties');
     const properties = await res.json();
 
     selectedProperty = properties.find(p => p.id === id);
@@ -1170,7 +1170,7 @@ async function loadBookingConfirmation() {
     }
 
     try {
-        const propRes = await authFetch('/data/properties');
+        const propRes = await authFetch('/properties');
         const properties = await propRes.json();
 
         const property = properties.find(p => p.id === saved.propertyId);
@@ -1199,7 +1199,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Remove legacy unscoped keys left over from before user-scoping was added
     localStorage.removeItem('personalInfo');
     localStorage.removeItem('paymentMethods');
-    localStorage.removeItem("token");
 
     updateAuthButton();
 
