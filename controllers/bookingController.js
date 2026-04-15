@@ -78,6 +78,7 @@ export const deleteBooking = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
-//  Booking controller completed.
+
+// Booking controller completed.
 // Routes still need to be created in bookingsRoutes.js.
 // Will be connected to app.js later.
