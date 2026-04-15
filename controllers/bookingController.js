@@ -1,4 +1,4 @@
-const Booking = require("../config/db.js");
+import pool from "../config/db.js";
 
 // ===========Create Bookings =============
 export const createBooking = async (req, res) => {
