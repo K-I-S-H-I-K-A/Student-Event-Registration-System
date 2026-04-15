@@ -59,3 +59,7 @@ export const deleteBooking = async (req, res) => {
   await pool.query("DELETE FROM bookings WHERE id = ?", [id]);
 
         res.json({ success: true });
+ } catch (err) {
+        res.status(500).json({ success: false });
+    }
+};
