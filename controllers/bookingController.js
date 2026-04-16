@@ -1,3 +1,5 @@
+// Booking Controller
+// Handles create, read, and delete booking operations
 import pool from "../config/db.js";
 
 // =========== CREATE BOOKING =============
