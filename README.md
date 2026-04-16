@@ -11,5 +11,14 @@ This app is a group project designed to connect property owners with people look
 - Added a search and filter feature for Coworkers to find spaces.
 - Added a booking page, booking confirmation and profile page.
 - **Note** At this stage, all data is stored in Json.
-## Phase 2
-- Booking feature implemented with data 
+- 
+## Phase 2, the project is converted into a full-stack web application by adding a backend server and database.
+
+
+## Backend Features
+
+- Built using Node.js and Express
+- REST API for all main functions
+- Connects to a database to store data permanently
+- Supports authentication (login and signup)
+- Role-based access (Owner and Coworker)
