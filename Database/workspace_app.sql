@@ -57,6 +57,39 @@ LOCK TABLES `properties` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `bookings`
+--
+
+DROP TABLE IF EXISTS `bookings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bookings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL,
+  `propertyId` int NOT NULL,
+  `date` date NOT NULL,
+  `startTime` varchar(5) NOT NULL,
+  `duration` int NOT NULL,
+  `hourlyRate` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `serviceFee` decimal(10,2) NOT NULL,
+  `total` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_userId` (`userId`),
+  KEY `idx_propertyId_date` (`propertyId`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bookings`
+--
+
+LOCK TABLES `bookings` WRITE;
+/*!40000 ALTER TABLE `bookings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bookings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 

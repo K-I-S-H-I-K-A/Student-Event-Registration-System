@@ -2,9 +2,10 @@ import express from 'express';
 import path from 'path'; 
 import { fileURLToPath } from 'url'; 
 
-import authRoutes from './routes/authRoutes.js'; 
+import authRoutes from './routes/authRoutes.js';
 import propertyRoutes from "./routes/propertyRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 
 const app = express(); 
 const PORT = 3000; 
@@ -26,6 +27,9 @@ app.use("/properties", propertyRoutes);
 
 // User routes
 app.use("/users", userRoutes);
+
+// Booking routes
+app.use("/bookings", bookingRoutes);
 
 // Serve frontend 
 app.use(express.static(path.join(__dirname, 'public')));
