@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import pool from "../config/db.js";
 
 // ===== CREATE BOOKING =====
@@ -127,3 +128,91 @@ export const deleteBooking = async (req, res) => {
         res.status(500).json({ success: false });
     }
 };
+=======
+// Booking Controller
+// Handles create, read, and delete booking operations
+import pool from "../config/db.js";
+
+// =========== CREATE BOOKING =============
+export const createBooking = async (req, res) => {
+  try {
+    const { propertyId, date, time, status } = req.body;
+
+    const userId = req.user.id;
+
+    const [result] = await pool.query(
+      `INSERT INTO bookings
+      (propertyId, userId, date, time, status)
+      VALUES (?, ?, ?, ?, ?)`,
+      [propertyId, userId, date, time, status || "pending"]
+    );
+
+    res.json({
+      success: true,
+      bookingId: result.insertId
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
+
+// ===== GET ALL BOOKINGS =====
+export const getBookings = async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM bookings");
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
+
+// ===== GET BOOKING BY ID =====
+export const getBookingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await pool.query(
+      "SELECT * FROM bookings WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    res.json(rows[0]);
+
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
+
+// ===== DELETE BOOKING =====
+export const deleteBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await pool.query(
+      "SELECT * FROM bookings WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    await pool.query("DELETE FROM bookings WHERE id = ?", [id]);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
+
+// Booking controller completed.
+// Routes still need to be created in bookingsRoutes.js.
+// Will be connected to app.js later.
+>>>>>>> 3579f549ad2b06b10b42b8acbd869be8ea612f19
