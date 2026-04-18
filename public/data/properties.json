@@ -96,5 +96,27 @@
     "description": "Beautiful apartment with a great river view.",
     "status": "Not Booked",
     "id": 7
+  },
+  {
+    "workspace": "Testing Land Apartment",
+    "address": "3321 Testland NW",
+    "neighbourhood": "Testland-woods",
+    "sqft": "1700",
+    "parking": true,
+    "transit": true,
+    "wifi": true,
+    "meetingRooms": false,
+    "quietZone": false,
+    "amenities": [
+      "Parking Space",
+      "Public Transport",
+      "Wi-Fi"
+    ],
+    "ownerId": 7,
+    "owner": "",
+    "price": 80,
+    "description": "Just a testing apartment for the project",
+    "status": "Not Booked",
+    "id": 8
   }
 ]

@@ -2,18 +2,6 @@
   {
     "userId": 1,
     "propertyId": 3,
-    "date": "2026-04-16",
-    "startTime": "16:03",
-    "duration": 4,
-    "hourlyRate": 100,
-    "subtotal": 400,
-    "serviceFee": 12,
-    "total": 412,
-    "id": 4
-  },
-  {
-    "userId": 1,
-    "propertyId": 3,
     "date": "2026-05-07",
     "startTime": "17:05",
     "duration": 3,
@@ -34,42 +22,6 @@
     "serviceFee": 9,
     "total": 309,
     "id": 6
-  },
-  {
-    "userId": 1,
-    "propertyId": 3,
-    "date": "2026-04-22",
-    "startTime": "16:35",
-    "duration": 4,
-    "hourlyRate": 100,
-    "subtotal": 400,
-    "serviceFee": 12,
-    "total": 412,
-    "id": 7
-  },
-  {
-    "userId": 1,
-    "propertyId": 4,
-    "date": "2026-04-02",
-    "startTime": "17:45",
-    "duration": 5,
-    "hourlyRate": 75,
-    "subtotal": 375,
-    "serviceFee": 11.25,
-    "total": 386.25,
-    "id": 9
-  },
-  {
-    "userId": 1,
-    "propertyId": 3,
-    "date": "2026-04-02",
-    "startTime": "20:15",
-    "duration": 5,
-    "hourlyRate": 100,
-    "subtotal": 500,
-    "serviceFee": 15,
-    "total": 515,
-    "id": 10
   },
   {
     "userId": 1,
@@ -96,18 +48,6 @@
     "id": 12
   },
   {
-    "userId": 1,
-    "propertyId": 4,
-    "date": "2026-04-11",
-    "startTime": "09:35",
-    "duration": 6,
-    "hourlyRate": 75,
-    "subtotal": 450,
-    "serviceFee": 13.5,
-    "total": 463.5,
-    "id": 13
-  },
-  {
     "userId": 7,
     "propertyId": 3,
     "date": "2026-04-08",
@@ -118,5 +58,29 @@
     "serviceFee": 18,
     "total": 618,
     "id": 14
+  },
+  {
+    "userId": 9,
+    "propertyId": 7,
+    "date": "2026-04-03",
+    "startTime": "10:30",
+    "duration": 10,
+    "hourlyRate": 80,
+    "subtotal": 800,
+    "serviceFee": 24,
+    "total": 824,
+    "id": 15
+  },
+  {
+    "userId": 1,
+    "propertyId": 6,
+    "date": "2026-04-22",
+    "startTime": "12:30",
+    "duration": 8,
+    "hourlyRate": 70,
+    "subtotal": 560,
+    "serviceFee": 16.8,
+    "total": 576.8,
+    "id": 16
   }
 ]
