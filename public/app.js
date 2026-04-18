@@ -1136,7 +1136,7 @@ async function bookNow() {
     };
 
     try {
-        const res = await authFetch('/bookings', {
+        const res = await authFetch('/book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(booking)
