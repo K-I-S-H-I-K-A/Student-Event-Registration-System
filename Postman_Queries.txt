@@ -3,7 +3,7 @@
 Post:
 http://localhost:3000/register
 
-Body:
+Go to Body > raw > JSON and paste:
 {
   "email": "test@example.com",
   "password": "123456",
@@ -17,7 +17,7 @@ Body:
 Post:
 http://localhost:3000/login
 
-Body:
+Go to Body > raw > JSON and paste:
 {
   "email": "test@example.com",
   "password": "123456"
@@ -41,7 +41,7 @@ Add header:
 
 Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
 
-Body:
+Go to Body > raw > JSON and paste:
 {
   "workspace": "Downtown Office",
   "address": "123 Main St",
@@ -71,7 +71,7 @@ Add header:
 
 Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
 
-Body:
+Go to Body > raw > JSON and paste:
 {
   "workspace": "Updated Office",
   "address": "123 Main St",
@@ -90,40 +90,3 @@ http://localhost:3000/properties/1
 Add header:
 
 Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
-
-============ Create Bookings ==============
-
-Post:
-http://localhost:3000/bookings
-
-Add header:
-
-Authorization: Bearer YOUR_TOKEN_HERE (Replace YOUR_TOKEN_HERE with the token you got from login)
-
-Body:
-{
-  "userId": 1,
-  "propertyId": 1,
-  "date": "2026-04-20",
-  "startTime": "10:00",
-  "duration": 2,
-  "hourlyRate": 20,
-  "subtotal": 40,
-  "serviceFee": 1.2,
-  "total": 41.2
-}
-
-============ Get All Bookings ==============
-
-Get:
-http://localhost:3000/bookings
-
-============ Get Bookings By ID ==============
-
-Get:
-http://localhost:3000/bookings/1
-
-============ Delete Booking ==============
-
-Delete:
-http://localhost:3000/bookings/1
