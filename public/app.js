@@ -1079,19 +1079,34 @@ async function loadPropertyDetails() {
         }
     }
 
-    // ===== OWNER NAME =====
+    // ===== OWNER INFO =====
     const ownerNameEl = document.getElementById("ownerName");
+    const ownerRoleEl = document.getElementById("ownerRole");
+    const ownerEmailEl = document.getElementById("ownerEmail");
+    const ownerPhoneEl = document.getElementById("ownerPhone");
 
-    if (ownerNameEl && selectedProperty.ownerId) {
+    const setOwner = (name, role, email, phone) => {
+        if (ownerNameEl) ownerNameEl.textContent = `Name: ${name || "—"}`;
+        if (ownerRoleEl) ownerRoleEl.textContent = `Role: ${role || "—"}`;
+        if (ownerEmailEl) ownerEmailEl.textContent = `Email: ${email || "—"}`;
+        if (ownerPhoneEl) ownerPhoneEl.textContent = `Phone: ${phone || "—"}`;
+    };
+
+    if (selectedProperty.ownerId) {
         try {
-            const userRes = await authFetch(`/user?id=${selectedProperty.ownerId}`);
+            const userRes = await fetch(`/users/${selectedProperty.ownerId}`);
             const userData = await userRes.json();
-            ownerNameEl.textContent = userData.name || "Unknown Host";
+            setOwner(
+                userData.name || "Unknown Host",
+                userData.role,
+                userData.email,
+                userData.phone
+            );
         } catch {
-            ownerNameEl.textContent = "Unknown Host";
+            setOwner("Unknown Host");
         }
-    } else if (ownerNameEl) {
-        ownerNameEl.textContent = "Unknown Host";
+    } else {
+        setOwner("Unknown Host");
     }
 
     // Render price initially
