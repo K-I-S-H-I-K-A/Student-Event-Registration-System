@@ -541,6 +541,7 @@ async function addProperty() {
     const address = document.getElementById('prop-address')?.value.trim();
     const neighbourhood = document.getElementById('prop-neighbourhood')?.value.trim();
     const sqft = document.getElementById('prop-sqft')?.value.trim();
+    const capacity = document.getElementById('prop-capacity')?.value.trim();
     const price = parseFloat(document.getElementById('prop-price')?.value) || 0;
     const description = document.getElementById('prop-description')?.value.trim();
     const parking = document.getElementById('prop-parking')?.checked;
@@ -549,7 +550,7 @@ async function addProperty() {
     const meetingRooms = document.getElementById('prop-meeting-rooms')?.checked;
     const quietZone = document.getElementById('prop-quiet-zone')?.checked;
 
-    if (!address || !sqft) return;
+    if (!address || !sqft || !capacity) return;
 
     const amenities = [];
     if (parking) amenities.push('Parking Space');
@@ -563,6 +564,7 @@ async function addProperty() {
         address,
         neighbourhood,
         sqft,
+        capacity: parseInt(capacity, 10),
         parking,
         transit,
         wifi,
@@ -594,6 +596,7 @@ async function addProperty() {
             document.getElementById('prop-address').value = '';
             document.getElementById('prop-neighbourhood').value = '';
             document.getElementById('prop-sqft').value = '';
+            document.getElementById('prop-capacity').value = '';
             document.getElementById('prop-price').value = '';
             document.getElementById('prop-description').value = '';
             document.getElementById('prop-parking').checked = false;
@@ -633,6 +636,7 @@ function renderProperties() {
             <td>${p.address}</td>
             <td>${p.neighbourhood || '—'}</td>
             <td>${p.sqft}</td>
+            <td>${p.capacity ?? '—'}</td>
             <td>${p.price ? '$' + p.price + '/hr' : '—'}</td>
             <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${i}); return false;">Edit</a></td>
         `;
@@ -648,6 +652,7 @@ function openPropertyModal(index) {
     document.getElementById('edit-prop-address').value = p.address;
     document.getElementById('edit-prop-neighbourhood').value = p.neighbourhood || '';
     document.getElementById('edit-prop-sqft').value = p.sqft;
+    document.getElementById('edit-prop-capacity').value = p.capacity != null ? p.capacity : '';
     document.getElementById('edit-prop-price').value = p.price != null ? p.price : '';
     document.getElementById('edit-prop-description').value = p.description || '';
     document.getElementById('edit-prop-parking').checked = p.parking || false;
@@ -674,6 +679,7 @@ async function savePropertyEdit() {
     const address = document.getElementById('edit-prop-address').value.trim();
     const neighbourhood = document.getElementById('edit-prop-neighbourhood').value.trim();
     const sqft = document.getElementById('edit-prop-sqft').value.trim();
+    const capacity = document.getElementById('edit-prop-capacity').value.trim();
     const price = parseFloat(document.getElementById('edit-prop-price').value) || 0;
     const description = document.getElementById('edit-prop-description').value.trim();
     const parking = document.getElementById('edit-prop-parking').checked;
@@ -682,7 +688,7 @@ async function savePropertyEdit() {
     const meetingRooms = document.getElementById('edit-prop-meeting-rooms').checked;
     const quietZone = document.getElementById('edit-prop-quiet-zone').checked;
 
-    if (!address || !sqft) return;
+    if (!address || !sqft || !capacity) return;
 
     const amenities = [];
     if (parking) amenities.push('Parking Space');
@@ -692,7 +698,7 @@ async function savePropertyEdit() {
     if (quietZone) amenities.push('Quiet Zone');
 
     const p = properties[editingPropertyIndex];
-    const updated = { address, neighbourhood, sqft, price, description, parking, transit, wifi, meetingRooms, quietZone, amenities, workspace: workspaceName || address };
+    const updated = { address, neighbourhood, sqft, capacity: parseInt(capacity, 10), price, description, parking, transit, wifi, meetingRooms, quietZone, amenities, workspace: workspaceName || address };
 
     try {
         const res = await authFetch(`/properties/${p.id}`, {
@@ -942,6 +948,9 @@ function applyAdvancedFilter() {
     const sqftCondition = document.getElementById("sqftCondition")?.value;
     const sqftValue = parseFloat(document.getElementById("sqftValue")?.value);
 
+    const capacityCondition = document.getElementById("capacityCondition")?.value;
+    const capacityValue = parseFloat(document.getElementById("capacityValue")?.value);
+
     const priceCondition = document.getElementById("priceCondition")?.value;
     const priceValue = parseFloat(document.getElementById("priceValue")?.value);
 
@@ -967,6 +976,17 @@ function applyAdvancedFilter() {
             if (sqftCondition === "gt") return sqft > sqftValue;
             if (sqftCondition === "lt") return sqft < sqftValue;
             if (sqftCondition === "eq") return sqft === sqftValue;
+        });
+    }
+
+    // Capacity filter
+    if (capacityCondition && !isNaN(capacityValue)) {
+        filtered = filtered.filter(p => {
+            const cap = parseFloat(p.capacity);
+            if (isNaN(cap)) return false;
+            if (capacityCondition === "gt") return cap > capacityValue;
+            if (capacityCondition === "lt") return cap < capacityValue;
+            if (capacityCondition === "eq") return cap === capacityValue;
         });
     }
 
@@ -1039,6 +1059,7 @@ function renderFilteredProperties(list) {
             <td>${p.address}</td>
             <td>${p.neighbourhood || '—'}</td>
             <td>${p.sqft}</td>
+            <td>${p.capacity ?? '—'}</td>
             <td>${p.price ? '$' + p.price + '/hr' : '—'}</td>
             <td><a href="#" class="profile-action-link" onclick="openPropertyModal(${realIndex}); return false;">Edit</a></td>
         `;

@@ -3,15 +3,15 @@ import pool from "../config/db.js";
 // ===== CREATE PROPERTY =====
 export const createProperty = async (req, res) => {
     try {
-        const { workspace, address, neighbourhood, sqft, price, description, amenities } = req.body;
+        const { workspace, address, neighbourhood, sqft, capacity, price, description, amenities } = req.body;
 
         const ownerId = req.user.id; // from JWT
 
         const [result] = await pool.query(
-            `INSERT INTO properties 
-            (workspace, address, neighbourhood, sqft, price, description, amenities, ownerId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [workspace, address, neighbourhood, sqft, price, description, JSON.stringify(amenities), ownerId]
+            `INSERT INTO properties
+            (workspace, address, neighbourhood, sqft, capacity, price, description, amenities, ownerId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [workspace, address, neighbourhood, sqft, capacity, price, description, JSON.stringify(amenities), ownerId]
         );
 
         res.json({
@@ -88,13 +88,13 @@ export const updateProperty = async (req, res) => {
             return res.status(403).json({ message: "Not authorized" });
         }
 
-        const { workspace, address, neighbourhood, sqft, price, description, amenities } = req.body;
+        const { workspace, address, neighbourhood, sqft, capacity, price, description, amenities } = req.body;
 
         await pool.query(
-            `UPDATE properties 
-             SET workspace=?, address=?, neighbourhood=?, sqft=?, price=?, description=?, amenities=?
+            `UPDATE properties
+             SET workspace=?, address=?, neighbourhood=?, sqft=?, capacity=?, price=?, description=?, amenities=?
              WHERE id=?`,
-            [workspace, address, neighbourhood, sqft, price, description, JSON.stringify(amenities), id]
+            [workspace, address, neighbourhood, sqft, capacity, price, description, JSON.stringify(amenities), id]
         );
 
         res.json({ success: true });

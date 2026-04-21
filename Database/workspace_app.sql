@@ -36,6 +36,7 @@ CREATE TABLE `properties` (
   `address` varchar(255) DEFAULT NULL,
   `neighbourhood` varchar(100) DEFAULT NULL,
   `sqft` int DEFAULT NULL,
+  `capacity` int DEFAULT NULL,
   `parking` tinyint(1) DEFAULT NULL,
   `transit` tinyint(1) DEFAULT NULL,
   `amenities` text,
