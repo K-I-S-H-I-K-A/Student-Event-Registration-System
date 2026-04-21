@@ -8,6 +8,7 @@ import {
 } from "../controllers/propertyController.js";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
+import { requireCompleteProfile } from "../middleware/requireCompleteProfile.js";
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get("/", getAllProperties);
 router.get("/:id", getPropertyById);
 
 // Protected
-router.post("/", authMiddleware, createProperty);
+router.post("/", authMiddleware, requireCompleteProfile, createProperty);
 router.put("/:id", authMiddleware, updateProperty);
 router.delete("/:id", authMiddleware, deleteProperty);
 

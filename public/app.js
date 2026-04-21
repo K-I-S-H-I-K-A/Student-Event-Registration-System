@@ -399,16 +399,34 @@ async function renderCalendarSlots() {
     }
 }
 
+// Handle a 403 from the requireCompleteProfile middleware.
+// Returns true if the response was a profile-incomplete 403 (caller should stop).
+function handleIncompleteProfile(res, data, action) {
+    if (res.status !== 403 || !data?.missingFields) return false;
+
+    const label = action === 'booking' ? 'booking a workspace' : 'listing a property';
+    alert(`Please complete your Personal Information before ${label}.`);
+
+    if (window.location.pathname.endsWith('/profile.html') ||
+        window.location.pathname.endsWith('profile.html')) {
+        const section = document.querySelector('.profile-section');
+        section?.scrollIntoView({ behavior: 'smooth' });
+        const firstMissing = data.missingFields[0];
+        const el = document.getElementById(`profile-${firstMissing}`);
+        el?.focus();
+    } else {
+        window.location.href = 'profile.html';
+    }
+    return true;
+}
+
 // ===== PERSONAL INFO FUNCTIONS =====
 
-// save user profile info to localStorage
-function savePersonalInfo() {
-    const userId = localStorage.getItem('userId');
-
+// save user profile info to the backend
+async function savePersonalInfo() {
     const info = {
         name: document.getElementById('profile-name')?.value || '',
         phone: document.getElementById('profile-phone')?.value || '',
-        email: document.getElementById('profile-email')?.value || '',
         address: document.getElementById('profile-address')?.value || '',
         city: document.getElementById('profile-city')?.value || '',
         zip: document.getElementById('profile-zip')?.value || '',
@@ -416,8 +434,26 @@ function savePersonalInfo() {
         country: document.getElementById('profile-country')?.value || ''
     };
 
-    localStorage.setItem(`personalInfo_${userId}`, JSON.stringify(info));
-    setPersonalInfoMode('view');
+    try {
+        const res = await authFetch('/users/me', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(info)
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            alert(data.message || 'Could not save profile.');
+            return;
+        }
+
+        const updated = await res.json();
+        if (updated?.name) localStorage.setItem('userName', updated.name);
+        setPersonalInfoMode('view');
+    } catch (err) {
+        console.error('savePersonalInfo error:', err);
+        alert('Server error while saving profile.');
+    }
 }
 
 // Switch profile section to edit mode
@@ -442,47 +478,44 @@ function setPersonalInfoMode(mode) {
     }
 }
 
-// Load saved personal info into form fields
-function loadPersonalInfo() {
-    const userId = localStorage.getItem('userId');
-    const saved = JSON.parse(localStorage.getItem(`personalInfo_${userId}`) || 'null');
-
+// Load personal info from the backend into form fields
+async function loadPersonalInfo() {
     const nameField = document.getElementById('profile-name');
     if (!nameField) return; // not on profile page
 
-    // Get name from saved info or localStorage, falling back to server fetch
-    const storedName = localStorage.getItem('userName');
-    const validStoredName = storedName && storedName !== 'undefined' ? storedName : null;
-    const resolvedName = saved?.name || validStoredName;
+    try {
+        const res = await authFetch('/users/me');
+        if (!res.ok) return;
 
-    if (resolvedName) {
-        nameField.value = resolvedName;
-    } else if (userId) {
-        // Fetch from server if not available locally
-        authFetch(`/users/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.name) {
-                    localStorage.setItem('userName', data.name);
-                    nameField.value = data.name;
-                }
-            })
-            .catch(() => { });
+        const user = await res.json();
+
+        nameField.value = user.name || '';
+        if (user.name) localStorage.setItem('userName', user.name);
+
+        const setVal = (id, v) => {
+            const el = document.getElementById(id);
+            if (el) el.value = v || '';
+        };
+
+        setVal('profile-phone', user.phone);
+        setVal('profile-email', user.email);
+        setVal('profile-address', user.address);
+        setVal('profile-city', user.city);
+        setVal('profile-zip', user.zip);
+        setVal('profile-province', user.province);
+        setVal('profile-country', user.country);
+
+        // Email is always populated (it's the login field) so lock it.
+        const emailEl = document.getElementById('profile-email');
+        if (emailEl) emailEl.readOnly = true;
+
+        // Keep form editable if the profile is incomplete; otherwise lock it.
+        const required = ['name', 'phone', 'address', 'city', 'zip', 'province', 'country'];
+        const incomplete = required.some(f => !user[f] || String(user[f]).trim() === '');
+        setPersonalInfoMode(incomplete ? 'edit' : 'view');
+    } catch (err) {
+        console.error('loadPersonalInfo error:', err);
     }
-
-    if (!saved) return;
-
-    const phone = document.getElementById('profile-phone');
-    if (!phone) return;
-    phone.value = saved.phone || '';
-    document.getElementById('profile-email').value = saved.email || '';
-    document.getElementById('profile-address').value = saved.address || '';
-    document.getElementById('profile-city').value = saved.city || '';
-    document.getElementById('profile-zip').value = saved.zip || '';
-    document.getElementById('profile-province').value = saved.province || '';
-    document.getElementById('profile-country').value = saved.country || '';
-
-    setPersonalInfoMode('view');
 }
 
 // ===== PROPERTIES =====
@@ -550,6 +583,8 @@ async function addProperty() {
             body: JSON.stringify(newProperty)
         });
         const data = await res.json();
+
+        if (handleIncompleteProfile(res, data, 'property')) return;
 
         if (data.success) {
             properties.push(data.property);
@@ -1144,6 +1179,7 @@ async function bookNow() {
 
         const data = await res.json();
 
+        if (handleIncompleteProfile(res, data, 'booking')) return;
 
         if (data.success) {
             // store locally for confirmation page

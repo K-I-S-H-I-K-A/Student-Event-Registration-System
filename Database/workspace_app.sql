@@ -102,6 +102,11 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `zip` varchar(20) DEFAULT NULL,
+  `province` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
   `role` varchar(50) DEFAULT 'coworker',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
