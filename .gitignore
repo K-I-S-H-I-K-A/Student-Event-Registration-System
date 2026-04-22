@@ -26,6 +26,3 @@ dist-ssr
 # Environment variables
 .env
 
-# Organization
-CLAUDE.md
-prompt.md
