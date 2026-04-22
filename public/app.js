@@ -93,6 +93,12 @@ function registerUser() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                // Sweep any stale per-user data left in localStorage from previous
+                // accounts that happened to share this browser (e.g. reused ids).
+                Object.keys(localStorage)
+                    .filter(k => k.startsWith('paymentMethods_') || k.startsWith('personalInfo_'))
+                    .forEach(k => localStorage.removeItem(k));
+
                 alert("Account created!");
 
                 // redirect to login page after successful registration
@@ -346,13 +352,39 @@ function applyProfileRole() {
     // Update the role label
     roleLabel.textContent = role.charAt(0).toUpperCase() + role.slice(1);
 
-    // Hide owner-only sections for coworkers
-    if (role !== "owner") {
-        const addSection = document.getElementById("add-property-section");
-        const yourSection = document.getElementById("your-properties-section");
+    const addSection = document.getElementById("add-property-section");
+    const yourSection = document.getElementById("your-properties-section");
+    const becomeOwnerSection = document.getElementById("become-owner-section");
 
-        if (addSection) addSection.style.display = "none";
-        if (yourSection) yourSection.style.display = "none";
+    const isOwner = role === "owner";
+    if (addSection) addSection.style.display = isOwner ? "" : "none";
+    if (yourSection) yourSection.style.display = isOwner ? "" : "none";
+    if (becomeOwnerSection) becomeOwnerSection.style.display = isOwner ? "none" : "";
+}
+
+async function becomeOwner() {
+    const ok = confirm(
+        "Are you sure you want to list a property? This will upgrade your account to an owner account."
+    );
+    if (!ok) return;
+
+    try {
+        const res = await authFetch('/auth/become-owner', { method: 'POST' });
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Could not upgrade your account.");
+            return;
+        }
+
+        if (data.token) localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', 'owner');
+
+        applyProfileRole();
+        loadOwnerProperties();
+    } catch (err) {
+        console.error('becomeOwner error:', err);
+        alert('Server error while upgrading your account.');
     }
 }
 
@@ -591,7 +623,7 @@ async function addProperty() {
         if (handleIncompleteProfile(res, data, 'property')) return;
 
         if (data.success) {
-            properties.push(data.property);
+            properties.push({ ...newProperty, id: data.propertyId });
 
             // Clear form
             document.getElementById('prop-name').value = '';

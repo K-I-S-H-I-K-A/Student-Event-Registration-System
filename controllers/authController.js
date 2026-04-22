@@ -100,3 +100,24 @@ export const getUser = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+// ================= BECOME OWNER =================
+export const becomeOwner = async (req, res) => {
+    try {
+        await pool.query(
+            "UPDATE users SET role = 'owner' WHERE id = ?",
+            [req.user.id]
+        );
+
+        const token = jwt.sign(
+            { id: req.user.id, role: "owner", name: req.user.name },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.json({ success: true, role: "owner", token });
+    } catch (err) {
+        console.error("becomeOwner error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
