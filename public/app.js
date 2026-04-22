@@ -549,6 +549,7 @@ async function addProperty() {
     const wifi = document.getElementById('prop-wifi')?.checked;
     const meetingRooms = document.getElementById('prop-meeting-rooms')?.checked;
     const quietZone = document.getElementById('prop-quiet-zone')?.checked;
+    const smoking = document.getElementById('prop-smoking')?.checked;
 
     if (!address || !sqft || !capacity) return;
 
@@ -558,6 +559,7 @@ async function addProperty() {
     if (wifi) amenities.push('Wi-Fi');
     if (meetingRooms) amenities.push('Meeting Rooms');
     if (quietZone) amenities.push('Quiet Zone');
+    if (smoking) amenities.push('Smoking Permitted');
 
     const newProperty = {
         workspace: workspaceName || address,
@@ -604,6 +606,7 @@ async function addProperty() {
             document.getElementById('prop-wifi').checked = false;
             document.getElementById('prop-meeting-rooms').checked = false;
             document.getElementById('prop-quiet-zone').checked = false;
+            document.getElementById('prop-smoking').checked = false;
 
             renderProperties();
         }
@@ -660,6 +663,7 @@ function openPropertyModal(index) {
     document.getElementById('edit-prop-wifi').checked = p.wifi || false;
     document.getElementById('edit-prop-meeting-rooms').checked = p.meetingRooms || false;
     document.getElementById('edit-prop-quiet-zone').checked = p.quietZone || false;
+    document.getElementById('edit-prop-smoking').checked = p.amenities?.includes('Smoking Permitted') || false;
 
     document.getElementById('property-overlay').classList.add('active');
 }
@@ -687,6 +691,7 @@ async function savePropertyEdit() {
     const wifi = document.getElementById('edit-prop-wifi').checked;
     const meetingRooms = document.getElementById('edit-prop-meeting-rooms').checked;
     const quietZone = document.getElementById('edit-prop-quiet-zone').checked;
+    const smoking = document.getElementById('edit-prop-smoking').checked;
 
     if (!address || !sqft || !capacity) return;
 
@@ -696,6 +701,7 @@ async function savePropertyEdit() {
     if (wifi) amenities.push('Wi-Fi');
     if (meetingRooms) amenities.push('Meeting Rooms');
     if (quietZone) amenities.push('Quiet Zone');
+    if (smoking) amenities.push('Smoking Permitted');
 
     const p = properties[editingPropertyIndex];
     const updated = { address, neighbourhood, sqft, capacity: parseInt(capacity, 10), price, description, parking, transit, wifi, meetingRooms, quietZone, amenities, workspace: workspaceName || address };
